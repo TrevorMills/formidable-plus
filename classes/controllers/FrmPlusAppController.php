@@ -7,12 +7,19 @@ class FrmPlusAppController{
     }
     
     function front_head(){
-        $css = apply_filters('get_frmplus_stylesheet', FRMPLUS_URL .'/css/custom_theme.css');
+        $css = apply_filters('get_frmplus_stylesheet', FRMPLUS_URL .'/css/frm-plus.css');
         wp_enqueue_style('frmplus-forms', $css);
 		$script = apply_filters('get_frmplus_script', FRMPLUS_URL .'/js/frm_plus.js');
         wp_enqueue_script('frmplus-scripts', $script, array('jquery'));
 		if (!is_admin() or ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ){
 			add_action('wp_print_scripts',array($this,'declare_ajaxurl'));
+		}
+		if ( is_admin() ){
+	        wp_enqueue_style('frmplus-admin', FRMPLUS_URL . '/css/frm-plus-admin.css' );
+	        wp_enqueue_script('frmplus-admin', FRMPLUS_URL . '/js/frm-plus-admin.js' );
+			wp_localize_script( 'frmplus-admin', 'FRMPLUS', array(
+				'types_with_options' => FrmPlusFieldsHelper::get_types( 'with_options' )
+			));
 		}
     }  
 
@@ -20,7 +27,7 @@ class FrmPlusAppController{
         global $frm_forms_controller;
         if($controller=='settings'){
             global $frmpro_settings;
-            require(FRMPLUS_PATH .'/css/custom_theme.css');
+            require(FRMPLUS_PATH .'/css/frm-plus.css');
 		}
     }
 

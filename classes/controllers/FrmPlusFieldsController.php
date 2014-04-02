@@ -6,6 +6,9 @@ class FrmPlusFieldsController{
         add_action('frm_form_fields', array(&$this, 'form_fields'), 10,2);
         add_action('wp_ajax_frm_add_field_option',array(&$this, 'add_option'),4); // run before the add_option in the FrmProFieldsController class
         add_action('wp_ajax_frm_delete_field_option',array(&$this, 'delete_option'),4); // run before the delete_option in the FrmProFieldsController class
+        add_action('wp_ajax_frm_field_option_ipe', array(&$this, 'edit_option'), 4); // run before the edit_option in the FrmProFieldsController class
+		add_action('wp_ajax_frm_plus_edit_option', array(&$this, 'edit_option'));
+		add_action('wp_ajax_frm_plus_get_options_form', array( &$this, 'get_options_form'));
         add_action('wp_ajax_frm_add_table_row',array(&$this, 'add_table_row')); 
         add_action('wp_ajax_nopriv_frm_add_table_row',array(&$this, 'add_table_row')); 
 		add_action('wp_ajax_frm_table_option_order',array(&$this,'reorder_table_options'));
@@ -172,6 +175,71 @@ class FrmPlusFieldsController{
 		
 		// Now that we've done our duty, carry on to FrmFieldsController::delete_option to actually delete the option
 		FrmFieldsController::delete_option();
+	}
+	
+	/** 
+	 * Called when the administrator changes the name of a field
+	 */
+	function edit_option(){
+        $ids = explode('-', $_POST['element_id']);
+        $id = str_replace('field_', '', $ids[0]);
+        if(strpos($_POST['element_id'], 'key_')){
+            $id = str_replace('key_', '', $id);
+        }
+        
+        $frm_field = new FrmField();
+        $field = $frm_field->getOne($id);
+		if ( $field->type == 'table' ){
+			$new_name = $_POST['update_value'];
+			// Let's do our work here.  
+	        $these_options = maybe_unserialize($field->options);
+			$this_opt = $these_options[ $ids[1] ];
+			
+			list( $type, $name, $options ) = FrmPlusFieldsHelper::parse_option( $this_opt );
+			$_POST['update_value'] = stripslashes( $_POST['update_value'] );
+			switch( $_POST['update_what'] ){
+			case 'type':
+				$type = ( empty($_POST['update_value']) ? 'text' : $_POST['update_value'] );
+				break;
+			case 'options':
+				$options = wp_parse_args( $_POST['update_value'] );
+				if ( is_array( $options['frmplus_options'] ) ){
+					$options = $options['frmplus_options'];
+				}
+				else{
+					$options = explode( "\n", $options['frmplus_options'] );
+				}
+				break;
+			case 'name':
+			default:
+				$name = $_POST['update_value'];
+		        echo (trim($name) == '') ? __('(Blank)', 'formidable') : $name;
+				break;
+			}
+			
+			$new_opt = ( 'text' === $type ? '' : "$type:" ) . $name . ( empty( $options ) ? '' : ':' . implode( '|', $options ) );
+			$these_options[ $ids[1] ] = $new_opt;
+	        $frm_field->update($id, array('options' => maybe_serialize($these_options)));
+			die();
+		}
+	}
+	
+	/** 
+	 * Called to get the options form for a particular field
+	 */
+	function get_options_form(){
+        $ids = explode('-', $_POST['element_id']);
+        $id = str_replace('field_', '', $ids[0]);
+        
+        $frm_field = new FrmField();
+        $field = $frm_field->getOne($id);
+
+		if ( $field && $field->type == 'table'){
+	        $these_options = maybe_unserialize($field->options);
+			$opt = $these_options[ $ids[1] ];
+			FrmPlusFieldsHelper::get_options_form( $opt, $field );
+			die();
+		}
 	}
 	
 	/** 

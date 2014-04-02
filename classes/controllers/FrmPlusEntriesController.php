@@ -30,7 +30,7 @@ class FrmPlusEntriesController{
 			}
 			if ($blank){
 	            $field_options = maybe_unserialize($posted_field->field_options);
-	            $errors['field'.$posted_field->id] = (!isset($field_options['blank']) or $field_options['blank'] == __('Untitled cannot be blank', FRM_PLUGIN_NAME) or $field_options['blank'] == '') ? ($posted_field->name . ' '. __('can\'t be blank', FRM_PLUGIN_NAME)) : $field_options['blank'];  
+	            $errors['field'.$posted_field->id] = (!isset($field_options['blank']) or $field_options['blank'] == __('Untitled cannot be blank', FRMPLUS_PLUGIN_NAME) or $field_options['blank'] == '') ? ($posted_field->name . ' '. __('can\'t be blank', FRMPLUS_PLUGIN_NAME)) : $field_options['blank'];  
 			}
 		}
 		return $errors;

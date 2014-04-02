@@ -1,6 +1,7 @@
 <?php
 
 class FrmPlusFieldsHelper{
+	private static $field_types;
 	
 	function FrmPlusFieldsHelper(){
 		add_filter('frm_pro_available_fields',array(&$this,'add_plus_fields'));
@@ -10,6 +11,72 @@ class FrmPlusFieldsHelper{
 		add_action('init', array(&$this,'perform_massage'));
 		add_action('frm_setup_edit_fields_vars',array(&$this,'setup_edit_field_vars'),10,3);
         //add_filter('frm_get_default_value', array($this, 'get_default_value')); // TODO make this work with current version.
+		
+		self::register_types();
+	}
+	
+	private static function register_types(){
+		self::register_type( array(
+			'type' => 'text'
+		));
+		self::register_type( array(
+			'type' => 'textarea'
+		));
+		self::register_type( array(
+			'type' => 'select',
+			'has_options' => true
+		));
+		self::register_type( array(
+			'type' => 'checkbox',
+			'has_options' => true
+		));
+		self::register_type( array(
+			'type' => 'radio',
+			'has_options' => true
+		));
+		self::register_type( array(
+			'type' => 'radioline',
+			'needs_massaging' => true
+		));
+		
+		do_action( 'frmplus_register_types' );
+	}
+	
+	/** 
+	 * A way to register field types that can appear in tables
+	 * 
+	 * @param $args array|object with the following members
+	 * 		type string - the type.  where we show the type to the user, it is run through __( ucwords( $type ), FRMPLUS_PLUGIN_NAME ) -> i.e. 'text' becomes 'Text'
+	 *		has_options boolean - whether or not this type accepts further options.  Optional, default is false
+	 * 		needs_massaging - whether or not this type needs to be massaged.  See the action 'frmplus_perform_massage'.  Optional, default is false
+	 * 		options_callback function - a callback for the options form to show the administrator.  
+	 * 									The default is just a textarea field with instructions to put one option per line.  
+	 *									If you use this callback, the callback should echo out contents for a form, but not the <form> tags themselves
+	 * 									the callback will be sent two arguments $options ( current options, a non-associative array ) and $field ( the Formidable Field )
+	 */
+	public static function register_type( $args ){
+		if ( !isset( self::$field_types ) ){
+			self::$field_types = array();
+		}
+		extract( (array)$args );
+		self::$field_types[ $type ] = new stdClass;
+		
+		$t = & self::$field_types[ $type ]; // shorthand
+		if ( isset( $has_options ) ){
+			$t->has_options = $has_options;
+		}
+		if ( isset( $needs_massaging ) ){
+			$t->needs_massaging = $needs_massaging;
+		}
+		if ( isset( $options_callback ) && is_callable( $options_callback ) ){
+			$t->options_callback = $options_callback;
+		}
+	}
+	
+	public static function unregister_type( $type ){
+		if ( isset( self::$field_types[ $type ] ) ){
+			unset( self::$field_types[ $type ] );
+		}
 	}
 	
 	/** 
@@ -247,12 +314,23 @@ class FrmPlusFieldsHelper{
 	public static function get_types($return = ''){
 		static $valid_types,$types_with_options,$types_need_massaging;
 		if (!isset($valid_types)){
-			$valid_types = apply_filters('frmplus_valid_field_types',array('textarea','select','checkbox','radio','radioline'));
-			$types_with_options = apply_filters('frmplus_field_types_with_options',array('select','checkbox','radio'));
+			$types_with_options = array();
+			$types_need_massaging = array();
+			foreach ( self::$field_types as $key => $type ){
+				if ( $type->has_options ){
+					$types_with_options[] = $key;
+				}
+				if ( $type->needs_massaging ){
+					$types_need_massaging[] = $key;
+				}
+			}
 			
-			// these are field types where the $_POST array needs to be massaged 
-			// before writing to the database
-			$types_need_massaging = apply_filters('frmplus_field_types_need_massaging',array('radioline'));
+			// these filters are deprecated and are kept here only for legacy reasons.  
+			// use FrmPlusFieldsHelper::register_type();
+			$valid_types = apply_filters('frmplus_valid_field_types', array_keys( self::$field_types ) );
+			$types_with_options = apply_filters('frmplus_field_types_with_options', $types_with_options );			
+			$types_need_massaging = apply_filters('frmplus_field_types_need_massaging',$types_need_massaging);	// these are field types where the $_POST array needs to be massaged before writing to the database
+
 		}
 		switch($return){
 		case 'valid':
@@ -264,6 +342,23 @@ class FrmPlusFieldsHelper{
 		default:
 			return array(&$valid_types,$types_with_options);
 		}
+	}
+	
+	public static function get_options_form( $opt, $field ){
+		list( $type, $name, $options ) = self::parse_option( $opt );
+		
+		$t = & self::$field_types[ $type ]; // shorthand
+		ob_start();
+		if ( isset( $t->options_callback) ){
+			$t->options_callback( $options );
+		}
+		else{
+			?>
+<p class="description"><?php _e( 'Enter one option per line', FRMPLUS_PLUGIN_NAME ); ?></p>
+<textarea rows="10" name="frmplus_options"><?php echo implode( "\n", $options ); ?></textarea>
+			<?php
+		}
+		
 	}
 	
 	public static function determine_precedence($row_type,$col_type){

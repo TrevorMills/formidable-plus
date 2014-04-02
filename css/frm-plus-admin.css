@@ -1,0 +1,47 @@
+.frm_form_fields:not(.frm_sample_form) select.frmplus_field_type{
+	width:auto;
+	font-size:10px;
+	vertical-align:top;
+}
+.frm_form_fields:not(.frm_sample_form) .frmplus_options_form input[type="button"]{
+	width:auto;
+}
+.frmplus_options_form{
+	padding:1em;
+	margin:0.5em 0.5em 0.5em 35px;
+	max-width:400px;
+	display:none;
+	background:white;
+	border:1px solid #ccc;
+	border-radius:10px;
+}
+.frmplus_options_form .form-actions{
+}
+.frm_single_option .icon16{
+	float:none;
+	width:1em;
+	padding:0;
+	margin:0;
+	cursor:pointer;
+}
+.frm_single_option .icon16:before{
+	height: 1em;
+	padding: 0;
+	vertical-align: top;
+	color:#A0A0A0;
+	-webkit-transition: -webkit-transform 0;
+	-moz-transition: -moz-transform 0;
+	transition: transform 0;
+}
+.frmplus_field_options:before {
+	content: "\f111";
+}
+.frm_single_option .icon16.working:before{
+	content: "\f321";
+	transform:rotate(-3600deg);
+	-ms-transform:rotate(-3600deg); /* IE 9 */
+	-webkit-transform:rotate(-3600deg); /* Opera, Chrome, and Safari */
+	-webkit-transition: -webkit-transform 10s linear;
+	-moz-transition: -moz-transform 10s linear;
+	transition: transform 10s linear;
+}
