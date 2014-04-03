@@ -279,7 +279,13 @@ class FrmPlusFieldsHelper{
 		}
 		list($valid_types,$types_with_options) = FrmPlusFieldsHelper::get_types();
 		
-		if (preg_match('/^('.implode('|',$valid_types).'):(.*)$/',$opt,$matches)){
+		if ( is_array( $opt ) ){
+			$opt = self::unconvert_deep( $opt );
+			$type = ( isset( $opt['type'] ) && in_array( $opt['type'], $valid_types ) ) ? $opt['type'] : 'text';
+			$name = isset( $opt['name'] ) ? $opt['name'] : __('(Blank)',FRMPLUS_PLUGIN_NAME);
+			$options = ( in_array( $type, $types_with_options ) && isset( $opt['options'] ) ) ? $opt['options'] : array();
+		}
+		elseif (preg_match('/^('.implode('|',$valid_types).'):(.*)$/',$opt,$matches)){
 			$type = $matches[1];
 			if ($return == 'type') return $type; // no need to carry on.... performance.  
 			if (in_array($type,$types_with_options)){
@@ -324,7 +330,9 @@ class FrmPlusFieldsHelper{
 	}
 	
 	/** 
-	 * When dealing with quotes, slashes and multibyte characters
+	 * When dealing with slashes in name and options, serialize and unserialize in 
+	 * combination with $frm_field->getOne() seems to drop the slashes.  
+	 * convert_deep is here to allow us to keep them.  
 	 */
 	public static function convert_deep( $array ){
 		foreach ( $array as $key => $value ){
@@ -332,7 +340,7 @@ class FrmPlusFieldsHelper{
 				$array[ $key ] = self::convert_deep( $value );
 			}
 			else{
-				$array[ $key ] = mb_encode_numericentity($value,array (0x0, 0xffff, 0, 0xffff) );
+				$array[$key] = str_replace( array('\\'), array('&#92;'), $value );
 			}
 		}
 		return $array;
@@ -344,8 +352,7 @@ class FrmPlusFieldsHelper{
 				$array[$key] = self::unconvert_deep( $value );
 			}
 			else{
-				$array[ $key ] = mb_decode_numericentity($value,array (0x0, 0xffff, 0, 0xffff) );
-				//$array[$key] = str_replace( array('&quot;','&#47;'), array('"','\\'), mb_decode_numericentity($value,array (0x0, 0xffff, 0, 0xffff)) );
+				$array[$key] = str_replace( array('&#92;'), array('\\'), $value );
 			}
 		}
 		return $array;

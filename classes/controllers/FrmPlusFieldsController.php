@@ -217,9 +217,14 @@ class FrmPlusFieldsController{
 				break;
 			}
 			
-			$new_opt = ( 'text' === $type ? '' : "$type:" ) . $name . ( empty( $options ) ? '' : ':' . json_encode( FrmPlusFieldsHelper::convert_deep($options)) );
+			//$new_opt = ( 'text' === $type ? '' : "$type:" ) . $name . ( empty( $options ) ? '' : ':' . json_encode( FrmPlusFieldsHelper::convert_deep($options)) );
+			$new_opt = array( 
+				'type' => $type,
+				'name' => $name,
+				'options' => $options
+			);
 			$these_options[ $ids[1] ] = $new_opt;
-	        $frm_field->update($id, array('options' => maybe_serialize($these_options)));
+	        $frm_field->update($id, array('options' => maybe_serialize( FrmPlusFieldsHelper::convert_deep($these_options) ) ) );
 			die();
 		}
 	}
