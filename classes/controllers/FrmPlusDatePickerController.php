@@ -112,7 +112,7 @@ class FrmPlusDatePickerController{
 		return $o;
 	}
 	
-	public function options_callback( $options, $field ){
+	public function options_callback( $options, $field, $index ){ 
 		$options = $this->massageOptions( $options );
 		$id = "datepicker-options-" . substr( md5( time() ), 0, 5 ); // random id for the DOM element
 		?>
@@ -205,4 +205,3 @@ jQuery(function($){
 }
 
 new FrmPlusDatePickerController();
-?>

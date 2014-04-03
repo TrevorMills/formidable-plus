@@ -207,7 +207,7 @@ class FrmPlusFieldsController{
 					$options = $options['frmplus_options'];
 				}
 				else{
-					$options = explode( "\n", $options['frmplus_options'] );
+					$options = explode( "\n", str_replace( "\r", '', $options['frmplus_options']) );
 				}
 				break;
 			case 'name':
@@ -217,13 +217,7 @@ class FrmPlusFieldsController{
 				break;
 			}
 			
-			if ( is_array( reset( $options ) ) ){
-				// just a trick to be able to write out an json_encoded object for the options
-				$options = array(
-					json_encode( $options )
-				);
-			}
-			$new_opt = ( 'text' === $type ? '' : "$type:" ) . $name . ( empty( $options ) ? '' : ':' . implode( '|', $options ) );
+			$new_opt = ( 'text' === $type ? '' : "$type:" ) . $name . ( empty( $options ) ? '' : ':' . json_encode( FrmPlusFieldsHelper::convert_deep($options)) );
 			$these_options[ $ids[1] ] = $new_opt;
 	        $frm_field->update($id, array('options' => maybe_serialize($these_options)));
 			die();
@@ -243,7 +237,7 @@ class FrmPlusFieldsController{
 		if ( $field && $field->type == 'table'){
 	        $these_options = maybe_unserialize($field->options);
 			$opt = $these_options[ $ids[1] ];
-			echo FrmPlusFieldsHelper::get_options_form( $opt, $field );
+			echo FrmPlusFieldsHelper::get_options_form( $opt, $field, $ids[1] );
 			die();
 		}
 	}

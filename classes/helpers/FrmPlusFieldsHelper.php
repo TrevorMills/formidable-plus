@@ -287,9 +287,9 @@ class FrmPlusFieldsHelper{
 				preg_match('/^([^\:]*)\:?(.*)$/',$matches[2],$options_matches);
 				$name = $options_matches[1];
 				if ($options_matches[2]){
-					if ( $test = json_decode( $options_matches[2] ) ){
-						// It's a json object, cast it into an array
-						$options = (array)$test;
+					if ( $test = json_decode( $options_matches[2], true ) ){
+						// It's a json object
+						$options = self::unconvert_deep($test);
 					}
 					else{
 						// It's a string of options
@@ -321,6 +321,34 @@ class FrmPlusFieldsHelper{
 		default:
 			return array($type,$name,$options);
 		}
+	}
+	
+	/** 
+	 * When dealing with quotes, slashes and multibyte characters
+	 */
+	public static function convert_deep( $array ){
+		foreach ( $array as $key => $value ){
+			if ( is_array( $value ) ){
+				$array[ $key ] = self::convert_deep( $value );
+			}
+			else{
+				$array[ $key ] = mb_encode_numericentity($value,array (0x0, 0xffff, 0, 0xffff) );
+			}
+		}
+		return $array;
+	}
+	
+	public static function unconvert_deep( $array ){
+		foreach ( $array as $key => $value ){
+			if ( is_array( $value ) ){
+				$array[$key] = self::unconvert_deep( $value );
+			}
+			else{
+				$array[ $key ] = mb_decode_numericentity($value,array (0x0, 0xffff, 0, 0xffff) );
+				//$array[$key] = str_replace( array('&quot;','&#47;'), array('"','\\'), mb_decode_numericentity($value,array (0x0, 0xffff, 0, 0xffff)) );
+			}
+		}
+		return $array;
 	}
 	
 	public static function get_types($return = ''){
@@ -356,13 +384,13 @@ class FrmPlusFieldsHelper{
 		}
 	}
 	
-	public static function get_options_form( $opt, $field ){
+	public static function get_options_form( $opt, $field, $index ){
 		list( $type, $name, $options ) = self::parse_option( $opt );
 		
 		$t = & self::$field_types[ $type ]; // shorthand
 		ob_start();
 		if ( isset( $t->options_callback) ){
-			call_user_func( $t->options_callback, $options, $field );
+			call_user_func( $t->options_callback, $options, $field, $index );
 		}
 		else{
 			static $lambda;
