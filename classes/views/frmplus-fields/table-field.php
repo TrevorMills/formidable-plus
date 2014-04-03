@@ -93,7 +93,12 @@ else {
 		}
 		break;
 	default:
-		echo '<input type="text" size="10" id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr($value).'" class="auto_width table-cell" />'."\n";
+		if ( has_action( 'frmplus_field_input_' . $type  ) ){
+			do_action( 'frmplus_field_input_' . $type, compact( 'field', 'name', 'value', 'options', 'row_num', 'col_num', 'this_field_id', 'this_field_name', 'precedence' ) );
+		}
+		else{
+			echo '<input type="text" size="10" id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr($value).'" class="auto_width table-cell" />'."\n";
+		}
 		break;
 	}
 	

@@ -57,6 +57,7 @@ require_once(FRMPLUS_CONTROLLERS_PATH . "/FrmPlusAppController.php");
 require_once(FRMPLUS_CONTROLLERS_PATH . "/FrmPlusFieldsController.php");
 require_once(FRMPLUS_CONTROLLERS_PATH . "/FrmPlusFormsController.php");
 require_once(FRMPLUS_CONTROLLERS_PATH . "/FrmPlusEntriesController.php");
+require_once(FRMPLUS_CONTROLLERS_PATH . "/FrmPlusDatePickerController.php");
 
 global $frmplus_app_controller;
 global $frmplus_fields_controller;
@@ -66,6 +67,7 @@ global $frmplus_entries_controller;
 $frmplus_app_controller         = new FrmPlusAppController();
 $frmplus_forms_controller       = new FrmPlusFormsController();
 $frmplus_fields_controller      = new FrmPlusFieldsController();
-$frmplus_entries_controller      = new FrmPlusEntriesController();
+$frmplus_entries_controller     = new FrmPlusEntriesController();
+
 
 ?>

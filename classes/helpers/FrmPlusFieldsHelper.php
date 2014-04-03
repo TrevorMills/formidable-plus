@@ -12,10 +12,12 @@ class FrmPlusFieldsHelper{
 		add_action('frm_setup_edit_fields_vars',array(&$this,'setup_edit_field_vars'),10,3);
         //add_filter('frm_get_default_value', array($this, 'get_default_value')); // TODO make this work with current version.
 		
-		self::register_types();
+		// Doing it on after_setup_theme as opposed to init because FrmPlusAppController does an 'init' on precedence 1.  
+		// We need types (including those added by themes or plugins) to be available during 'init'
+		add_action( 'after_setup_theme', 'FrmPlusFieldsHelper::register_types' );
 	}
 	
-	private static function register_types(){
+	public static function register_types(){
 		self::register_type( array(
 			'type' => 'text'
 		));
@@ -38,7 +40,7 @@ class FrmPlusFieldsHelper{
 			'type' => 'radioline',
 			'needs_massaging' => true
 		));
-		
+
 		do_action( 'frmplus_register_types' );
 	}
 	
@@ -53,6 +55,8 @@ class FrmPlusFieldsHelper{
 	 * 									The default is just a textarea field with instructions to put one option per line.  
 	 *									If you use this callback, the callback should echo out contents for a form, but not the <form> tags themselves
 	 * 									the callback will be sent two arguments $options ( current options, a non-associative array ) and $field ( the Formidable Field )
+	 * 		render_callback function  - a callback to render the field within a form.  This function will be passed an array with the following members
+	 * 									'field', 'name', 'value', 'options', 'row_num', 'col_num', 'this_field_id', 'this_field_name', 'precedence'
 	 */
 	public static function register_type( $args ){
 		if ( !isset( self::$field_types ) ){
@@ -70,6 +74,9 @@ class FrmPlusFieldsHelper{
 		}
 		if ( isset( $options_callback ) && is_callable( $options_callback ) ){
 			$t->options_callback = $options_callback;
+		}
+		if ( isset( $render_callback ) && is_callable( $render_callback ) ){
+			add_action( "frmplus_field_input_$type", $render_callback );
 		}
 	}
 	
@@ -280,7 +287,14 @@ class FrmPlusFieldsHelper{
 				preg_match('/^([^\:]*)\:?(.*)$/',$matches[2],$options_matches);
 				$name = $options_matches[1];
 				if ($options_matches[2]){
-					$options = explode('|',$options_matches[2]);
+					if ( $test = json_decode( $options_matches[2] ) ){
+						// It's a json object, cast it into an array
+						$options = (array)$test;
+					}
+					else{
+						// It's a string of options
+						$options = array_map( 'trim', explode('|',$options_matches[2] ) );
+					}
 				}
 				else{
 					$options = array();
@@ -297,8 +311,6 @@ class FrmPlusFieldsHelper{
 			$options = array();
 		}
 		
-		$options = array_map('trim',$options);
-
 		switch($return){
 		case 'type':
 			return $type;
@@ -350,15 +362,15 @@ class FrmPlusFieldsHelper{
 		$t = & self::$field_types[ $type ]; // shorthand
 		ob_start();
 		if ( isset( $t->options_callback) ){
-			$t->options_callback( $options );
+			call_user_func( $t->options_callback, $options, $field );
 		}
 		else{
 			?>
-<p class="description"><?php _e( 'Enter one option per line', FRMPLUS_PLUGIN_NAME ); ?></p>
+<p class="description"><?php _e( 'Enter one option per line', FRMPLUS_PLUGIN_NAME ); ?>:</p>
 <textarea rows="10" name="frmplus_options"><?php echo implode( "\n", $options ); ?></textarea>
 			<?php
 		}
-		
+		return ob_get_clean();
 	}
 	
 	public static function determine_precedence($row_type,$col_type){
