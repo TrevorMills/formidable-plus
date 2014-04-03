@@ -365,6 +365,11 @@ class FrmPlusFieldsHelper{
 			call_user_func( $t->options_callback, $options, $field );
 		}
 		else{
+			static $lambda;
+			if ( !isset( $lambda ) ){
+				$lambda = create_function( '$a', 'return !is_array( $a ); ');
+			}
+			$options = array_filter( $options, $lambda ); // remove members that are an array so we don't get Array\nArray as the values.
 			?>
 <p class="description"><?php _e( 'Enter one option per line', FRMPLUS_PLUGIN_NAME ); ?>:</p>
 <textarea rows="10" name="frmplus_options"><?php echo implode( "\n", $options ); ?></textarea>

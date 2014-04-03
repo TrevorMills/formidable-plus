@@ -4,11 +4,24 @@ jQuery(function($){
 		init: function(){
 			$('#frm_form_editor_container')
 				.on( 'change', '.frmplus_field_type', function(){
+					var $form = $(this).parents( '.frm_single_option' ).find( '.frmplus_options_form' );
+					var reopen = false;
+					if ( $form.is( ':visible' ) ){
+						$form.slideToggle( 200 );
+						if ( me.types_with_options.indexOf( $(this).val() ) != -1 ){
+							$form.parents( '.frm_single_option' ).find( '.frmplus_field_options' ).addClass( 'working' );
+							reopen = true;
+						}
+					}
 					$.post( ajaxurl, {
 						action: 'frm_plus_edit_option',
 						element_id: $(this).attr( 'id' ),
 						update_what: 'type',
 						update_value: $(this).val()
+					}, function(){
+						if ( reopen ){
+							$form.parents( '.frm_single_option' ).find( '.frmplus_field_options' ).trigger( 'click' );
+						}
 					});
 					if ( me.types_with_options.indexOf( $(this).val() ) != -1 ){
 						$(this).parents( '.frm_single_option' ).find( '.frmplus_field_options' ).show();
@@ -47,7 +60,6 @@ jQuery(function($){
 						update_what: 'options',
 						update_value: $(this).parents( '.frmplus_options_form' ).find( ':input' ).serialize()
 					}, function( result ){
-						console.log( result );
 						$options.trigger( 'click' ); // will close the form
 					});
 				})

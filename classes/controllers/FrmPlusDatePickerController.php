@@ -42,6 +42,7 @@ class FrmPlusDatePickerController{
 	var $dp_boolean_options = array(
 		'changeMonth',
 		'changeYear',
+		'constrainInput',
 		'gotoCurrent',
 		'hideIfNoPrevNext',
 		'isRTL',
@@ -61,6 +62,7 @@ class FrmPlusDatePickerController{
 	);
 
 	var $dp_numeric_options = array(
+		'firstDay',
 		'numberOfMonths',
 		'showCurrentAtPos',
 		'shortYearCutoff',
@@ -91,7 +93,7 @@ class FrmPlusDatePickerController{
 	}
 	
 	public function massageOptions( $options ){
-		if ( empty( $options ) ){
+		if ( empty( $options ) || !isset( $options['option'] ) || !isset( $options['value'] ) ){
 			return array();
 		}
 		$o = array_combine( $options['option'], $options['value'] );

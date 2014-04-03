@@ -204,10 +204,7 @@ class FrmPlusFieldsController{
 			case 'options':
 				$options = wp_parse_args( $_POST['update_value'] );
 				if ( is_array( $options['frmplus_options'] ) ){
-					// just a trick to be able to write out an json_encoded object for the options
-					$options = array(
-						json_encode( $options['frmplus_options'] )
-					);
+					$options = $options['frmplus_options'];
 				}
 				else{
 					$options = explode( "\n", $options['frmplus_options'] );
@@ -220,6 +217,12 @@ class FrmPlusFieldsController{
 				break;
 			}
 			
+			if ( is_array( reset( $options ) ) ){
+				// just a trick to be able to write out an json_encoded object for the options
+				$options = array(
+					json_encode( $options )
+				);
+			}
 			$new_opt = ( 'text' === $type ? '' : "$type:" ) . $name . ( empty( $options ) ? '' : ':' . implode( '|', $options ) );
 			$these_options[ $ids[1] ] = $new_opt;
 	        $frm_field->update($id, array('options' => maybe_serialize($these_options)));
