@@ -32,9 +32,21 @@ jQuery(function($){
 				})
 				.on( 'click', '.frmplus_field_options', function(){
 					var $form = $(this).parents( '.frm_single_option' ).find( '.frmplus_options_form' );
+					
+					// Close, without saving, any other options forms that are open
+					$(this).parents( 'form' ).find( '.frmplus_options_form' ).not( $form ).each( function(){
+						if ( $(this).css( 'display' ) == 'block' ){
+							$(this).slideToggle( 200, function(){
+								$(this).find( '.form-contents' ).empty();
+							});
+						}
+					});
+					
 					if ( $form.is( ':visible' ) ){
 						$(this).removeClass( 'working' );
-						$form.slideToggle( 200 );
+						$form.slideToggle( 200, function(){
+							$(this).find( '.form-contents' ).empty();
+						});
 					}
 					else{
 						var $this = $(this);
