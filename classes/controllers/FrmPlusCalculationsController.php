@@ -119,12 +119,14 @@ class FrmPlusCalculationsController{
 	
 	public function localize_script(){
 		wp_localize_script( 'frm-plus-calculations', 'FRM_PLUS_CALCULATIONS', 
-			array( 
+			apply_filters( 'frm-plus-calculations-localization', array( 
 				'particulars' => $this->prepareForLocalization( $this->particulars ),
 				'__' => array(
-					'error' => __( 'Error', FRMPLUS_PLUGIN_NAME )
+					'error' => __( 'Error', FRMPLUS_PLUGIN_NAME ),
+					'row_indicator' => '↔',
+					'column_indicator' => '↕'
 				)
-			)
+			))
 		);
 	}
 	

@@ -15,6 +15,11 @@ jQuery( function($){
 		 * calculators is the internal cache of calculators
 		 */
 		calculators: {},
+
+		/** 
+		 * calculators that are the intersection of calculated rows and calculated columns
+		 */
+		special_calculators: {},
 		
 		init: function(){
 			$.each( me.particulars, function( field_id, fields ){
@@ -45,6 +50,7 @@ jQuery( function($){
 				// for each on.  Make a single listener and perform all calculations there
 				var selectors = [];
 				me.calculators[ field_id ] = {};
+				me.special_calculators[ field_id ] = [];
 				$.each( fields, function( key, settings ){
 					$.each( settings.on, function( index, on ){
 						if ( typeof me.calculators[ field_id ][ on ] == 'undefined' ){
@@ -54,6 +60,11 @@ jQuery( function($){
 							selectors.push( '.' + on );
 						}
 						me.calculators[ field_id ][ on ][ key ] = settings;
+						
+						if ( typeof me.calculators[ field_id ][ key ] != 'undefined' && typeof me.calculators[ field_id ][ key ][ on ] != 'undefined' ){
+							// This is a case where a calculated column intersects with a calculated row.  We can handle that.  
+							me.special_calculators[ field_id ].push( me.getCardinality( on ) == 'row' ? { row: on, column: key } : { row: key, column: on } ); 
+						}
 					})
 				});
 				
@@ -85,12 +96,37 @@ jQuery( function($){
 							, settings )
 						);
 					});
+					
+					$.each( me.special_calculators[ field_id ], function( index, calculator ){
+						var settings, target = table_selector + '.' + calculator.row + ' .' + calculator.column + ' input.calculation';
+						if ( classes[1] == 'column' ){
+							// We've just calculated a row ( based on inputs in a column )
+							inputs = $( table_selector + '.' + calculator.row + ' :input' ).not( function(){ return $(this).parents( 'td' ).hasClass( calculator.column ); } );
+							settings = me.calculators[ field_id ][ calculator.column ][ calculator.row ];
+						}
+						else{
+							inputs = $( table_selector + '.' + calculator.column + ' :input' ).not( function(){ return $(this).parents( 'tr' ).hasClass( calculator.row ); } );
+							settings = me.calculators[ field_id ][ calculator.row ][ calculator.column ];
+						}
+						
+						$( target ).data( 'result-' + classes[1], 
+							me.toFixed( 
+								// this next line may look a little confusing, but it's just a compact way of calling a function
+								// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
+								// the value of settings.include_empty )
+								me[ settings.function ]( settings.include_empty ? inputs : inputs.not( function(){ return $(this).val() == ''; } ) )
+							, settings )
+						);
+						
+						if ( $( target ).data( 'result-row' ) == $( target ).data( 'result-column' ) ){
+							$( target ).val( $( target ).data( 'result-row' ) );
+						}
+						else{
+							$( target ).val( $( target ).data( 'result-row' ) + ' ' + me.__.column_indicator + ' ' + $( target ).data( 'result-column' ) + ' ' + me.__.row_indicator );
+						}
+					});
 				}); 
 			});
-			
-			console.log( me.calculators[ 1208 ] );
-			
-			
 		},
 		
 		getCardinality: function( key ){
