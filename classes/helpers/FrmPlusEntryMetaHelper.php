@@ -140,6 +140,9 @@ class FrmPlusEntryMetaHelper{
 				$entries[$entry_id] = $frm_entry->getOne($entry_id,true);
 			}
 			$entry = $entries[$entry_id];
+			if ( !$entry ){
+				return null;
+			}
 			$value = maybe_unserialize($entry->metas[$field_id]);
 			$value = stripslashes_deep($value); // here's where to strip slashes
 			if( is_array($value)){

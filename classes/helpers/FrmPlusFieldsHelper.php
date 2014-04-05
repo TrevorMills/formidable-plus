@@ -97,7 +97,7 @@ class FrmPlusFieldsHelper{
 	/** 
 	 * Default values for a new table added to a form
 	 */
-    function setup_new_vars($field_values){
+    static function setup_new_vars($field_values){
         if ($field_values['type'] == 'table')
             $field_values['options'] = serialize(array('col_1' => 'Column 1', 'col_2' => 'Column 2', 'row_1' => 'Row 1', 'row_2' => 'Row 2'));
         
@@ -514,7 +514,7 @@ class FrmPlusFieldsHelper{
 		}
 	}
 	
-	function setup_edit_field_vars( $value, $field, $entry_id ){
+	public static function setup_edit_field_vars( $value, $field, $entry_id ){
 		// Formidable Pro was having difficulties with table fields where there were dropdowns or radio buttons or the like
 		// if a form was saved where the table field was hidden (as in [formidable id=7 fields=952]).  To workaround,
 		// I'm just going to get those values myself for table fields.  
