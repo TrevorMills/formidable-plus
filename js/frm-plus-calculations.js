@@ -156,7 +156,7 @@ jQuery( function($){
 				if ( $( target ).data( 'result-row' ) == $( target ).data( 'result-column' ) ){
 					$( target ).val( $( target ).data( 'result-row' ) );
 				}
-				else{
+				else if ( typeof $( target ).data( 'result-row' ) != 'undefined' && typeof $( target ).data( 'result-column' ) != 'undefined' ){
 					$( target ).val( $( target ).data( 'result-row' ) + ' ' + me.__.column_indicator + ' ' + $( target ).data( 'result-column' ) + ' ' + me.__.row_indicator );
 				}
 			});
@@ -166,10 +166,7 @@ jQuery( function($){
 			if ( typeof number == 'string' ){
 				return number;
 			}
-			else if ( isNaN( number ) ){
-				return '';
-			}
-			else if ( number == 0 ){
+			else if ( isNaN( number ) || number == 0 ){
 				return '';
 			}
 			else{
