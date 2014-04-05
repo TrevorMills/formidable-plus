@@ -6,6 +6,8 @@ class FrmPlusCalculationsController{
 		'average',
 		'count',
 	);
+	
+	var $enqueued = false;
 
 	public function __construct(){
 		add_action( 'frmplus_register_types', array( &$this, 'register_type' ) );
@@ -75,10 +77,9 @@ class FrmPlusCalculationsController{
 			<label><?php _e( 'Precision:', FRMPLUS_PLUGIN_NAME ); ?></label>
 			<select name="frmplus_options[precision]">
 				<?php for( $p = 0; $p < 5; $p ++) : ?>
-					<option value="<?php echo $p; ?>" <?php selected( $p, $options['precision'] ); ?>><?php echo $p; ?></option>
+					<option value="<?php echo $p; ?>" <?php selected( $p, $options['precision'] ); ?>><?php echo $p . ' ' . __( 'decimal places', FRMPLUS_PLUGIN_NAME ); ?></option>
 				<?php endfor; ?>
 			</select>
-			<?php _e( 'decimal places', FRMPLUS_PLUGIN_NAME ); ?>
 			<label>
 				<input type="checkbox" name="frmplus_options[forced]" value="on" <?php checked( true, $options['forced'] ); ?>> <?php _e( 'forced', FRMPLUS_PLUGIN_NAME ); ?>
 				<span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php echo esc_attr( __( 'If forced, then this number of decimals will always show.  Otherwise, they only show when non-zero.', FRMPLUS_PLUGIN_NAME ) ); ?>"></span>

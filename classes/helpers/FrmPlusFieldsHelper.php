@@ -364,10 +364,10 @@ class FrmPlusFieldsHelper{
 			$types_with_options = array();
 			$types_need_massaging = array();
 			foreach ( self::$field_types as $key => $type ){
-				if ( $type->has_options ){
+				if ( isset( $type->has_options ) && $type->has_options ){
 					$types_with_options[] = $key;
 				}
-				if ( $type->needs_massaging ){
+				if ( isset( $type->needs_massaging ) && $type->needs_massaging ){
 					$types_need_massaging[] = $key;
 				}
 			}
