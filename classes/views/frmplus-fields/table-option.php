@@ -21,10 +21,6 @@
 		<div class="form-contents">
 			<!-- this gets filled in via AJAX -->
 		</div>
-		<div class="form-actions">
-			<input type="button" class="button-primary save" value="<?php echo esc_attr( __( 'Save' ) ); ?>" />
-			<input type="button" class="cancel" value="<?php echo esc_attr( __( 'Cancel' ) ); ?>" />
-		</div>
 	</div>
 </span>
 <div class="clear"></div>

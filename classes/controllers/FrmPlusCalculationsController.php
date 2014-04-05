@@ -62,9 +62,6 @@ class FrmPlusCalculationsController{
 		$is_a = substr($opt_key,0,3); // 'row' or 'col'
 		?>
 <div id="<?php echo $id; ?>">
-	<p class="description">
-		<?php printf( __( 'Blah blah blah' ) ); ?>
-	</p>
 	<div class="calculation-option">
 		<div class="section">
 			<label><?php _e( 'Function', FRMPLUS_PLUGIN_NAME ); ?>:</label>
@@ -84,13 +81,14 @@ class FrmPlusCalculationsController{
 			<?php _e( 'decimal places', FRMPLUS_PLUGIN_NAME ); ?>
 			<label>
 				<input type="checkbox" name="frmplus_options[forced]" value="on" <?php checked( true, $options['forced'] ); ?>> <?php _e( 'forced', FRMPLUS_PLUGIN_NAME ); ?>
-				<span class="frm_help frm_icon_font frm_tooltip_icon" title="" data-original-title="<?php echo esc_attr( __( 'If forced, then this number of decimals will always show.  Otherwise, they only show when non-zero.', FRMPLUS_PLUGIN_NAME ) ); ?>"></span>
+				<span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php echo esc_attr( __( 'If forced, then this number of decimals will always show.  Otherwise, they only show when non-zero.', FRMPLUS_PLUGIN_NAME ) ); ?>"></span>
 			</label>
 		</div>
 		<div class="section">
 			<?php _e( 'Include empty inputs in calculation?', FRMPLUS_PLUGIN_NAME ); ?>
 			<label><input type="radio" value="yes" name="frmplus_options[include_empty]" <?php checked( true, $options['include_empty'] ); ?>><?php _e( 'Yes', FRMPLUS_PLUGIN_NAME ); ?></label>
 			<label><input type="radio" value="no" name="frmplus_options[include_empty]" <?php checked( false, $options['include_empty'] ); ?>><?php _e( 'No', FRMPLUS_PLUGIN_NAME ); ?></label>
+			<span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php echo esc_attr( __( 'This comes into play for calculations where the number of elements is important (like average and count)', FRMPLUS_PLUGIN_NAME ) ); ?>"></span>
 		</div>
 		<?php foreach( array( 'rows', 'columns' ) as $what ) : ?>
 			<div class="section">
@@ -98,7 +96,7 @@ class FrmPlusCalculationsController{
 					<?php _e( 'Include all', FRMPLUS_PLUGIN_NAME ); ?> <?php _e( $what, FRMPLUS_PLUGIN_NAME ); ?>:
 					<label><input type="radio" value="yes" name="frmplus_options[<?php echo "all_{$what}"; ?>]" <?php checked( true, $options[ "all_{$what}" ] ); ?>><?php _e( 'Yes', FRMPLUS_PLUGIN_NAME ); ?></label>
 					<label><input type="radio" value="no" name="frmplus_options[<?php echo "all_{$what}"; ?>]" <?php checked( false, $options[ "all_{$what}" ] ); ?>><?php _e( 'No', FRMPLUS_PLUGIN_NAME ); ?></label>
-					<span class="frm_help frm_icon_font frm_tooltip_icon" title="" data-original-title="<?php echo esc_attr( sprintf( __( 'If there are %s that are not meant to be numeric, like a label or a date, then those %s should not be included in the calculation.', FRMPLUS_PLUGIN_NAME ), __( $what, FRMPLUS_PLUGIN_NAME ), __( $what, FRMPLUS_PLUGIN_NAME ) ) ); ?>"></span>
+					<span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php echo esc_attr( sprintf( __( 'If there are %s that are not meant to be numeric, like a label or a date, then those %s should not be included in the calculation.', FRMPLUS_PLUGIN_NAME ), __( $what, FRMPLUS_PLUGIN_NAME ), __( $what, FRMPLUS_PLUGIN_NAME ) ) ); ?>"></span>
 				</div>
 				<div class="select_<?php echo $what; ?>" <?php if ( $options[ "all_{$what}" ] ) : ?>style="display:none"<?php endif; ?>>
 					<?php printf( __( 'Which %s should be included?', FRMPLUS_PLUGIN_NAME ), __( $what, FRMPLUS_PLUGIN_NAME ) ); ?>
@@ -110,18 +108,6 @@ class FrmPlusCalculationsController{
 				</div>
 			</div>
 		<?php endforeach; ?>
-			<?php /*?>
-		</div>
-		<div class="available_<?php echo $is_a; ?>s" <?php if ( $options[ "all_{$is_a}s" ] )>>
-		<div style="display:none">
-			<label><?php _e( 'Calculate these', FRMPLUS_PLUGIN_NAME ); ?> <?php $is_a == 'row' ? _e( 'Columns', FRMPLUS_PLUGIN_NAME ) : _e( 'Rows', FRMPLUS_PLUGIN_NAME ); ?></label>
-			<?php foreach ( ($is_a == 'row' ? $columns : $rows) as $target => $opt ) : $label = FrmPlusFieldsHelper::parse_option( $opt, 'name' ); ?>
-				<div>
-					<label><input type="checkbox" name="frmplus_options[on][]" value="<?php echo $target; ?>" <?php checked( true, empty( $options['on'] ) || in_array( $target, $options['on'] ) ); ?>> <?php echo $label; ?></label>
-				</div>
-			<?php endforeach; ?>
-		</div>
-		*/ ?>
 	</div>
 </div>
 		<?php

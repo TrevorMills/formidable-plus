@@ -57,26 +57,21 @@ jQuery(function($){
 						}, function( markup ){
 							$this.removeClass( 'working' );
 							$form.find( '.form-contents' ).html( markup );
-							$form.find( '.save' ).removeAttr( 'disabled' );
 							$form.show();
 						})
 					}
 				})
-				.on( 'click', '.frmplus_options_form .save', function(){
+				.on( 'change', '.frmplus_options_form :input', function(){
 					var $options = $(this).parents( '.frm_single_option' ).find( '.frmplus_field_options' );
 					$options.addClass( 'working' );
-					$(this).prop( 'disabled', true );
 					$.post( ajaxurl, {
 						action: 'frm_plus_edit_option',
 						element_id: $options.attr( 'id' ),
 						update_what: 'options',
 						update_value: $(this).parents( '.frmplus_options_form' ).find( ':input' ).serialize()
 					}, function( result ){
-						$options.trigger( 'click' ); // will close the form
+						$options.removeClass( 'working' );
 					});
-				})
-				.on( 'click', '.frmplus_options_form .cancel', function(){
-					$(this).parents( '.frm_single_option' ).find( '.frmplus_field_options' ).trigger( 'click' );
 				})
 				.on( 'change', '.frmplus_options_form input[name*="all_rows"]', function(){
 					$( this ).parents( '.all_rows' ).next( '.select_rows' ).slideToggle();
