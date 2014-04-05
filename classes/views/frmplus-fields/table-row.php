@@ -1,3 +1,4 @@
+<?php if ( !isset( $display_only ) ) $display_only = false; ?>
 <?php if (!isset($row_num)) $row_num = 0; ?>
 <?php if (count($rows)) :  ?>
 		

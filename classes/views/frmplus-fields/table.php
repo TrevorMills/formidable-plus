@@ -7,6 +7,9 @@ if ( !isset( $field['field_key'] ) ){
 	global $frmdb, $wpdb;
 	$field['field_key'] = $wpdb->get_var( $wpdb->prepare("SELECT `field_key` FROM $frmdb->fields WHERE id = %d", $field['id'] ) );
 }	
+if ( !isset( $display_only ) ){
+	$display_only = false;
+}
 ?>
 <?php list($columns,$rows) = FrmPlusFieldsHelper::get_table_options($field['options']); ?>
 <?php echo apply_filters('frm-table-container-extras','',$field['id']); ?>

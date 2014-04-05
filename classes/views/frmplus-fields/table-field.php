@@ -2,7 +2,7 @@
 <?php
 // The value, if any, of this table cell
 $value = '';
-if (is_array($field['value']) and array_key_exists($row_num,$field['value'])){
+if ( isset( $field['value'] ) && is_array($field['value']) and array_key_exists($row_num,$field['value'])){
 	if (is_array($field['value'][$row_num])){
 		if (array_key_exists($col_num,$field['value'][$row_num])){
 			$value = $field['value'][$row_num][$col_num];
