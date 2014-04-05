@@ -27,45 +27,40 @@ jQuery( function($){
 				
 				// Sanitize Settings
 				$.each( fields, function( key, settings ){
-					var cardinality = me.getCardinality( key );
 					if ( typeof settings.function == 'undefined' ){
 						settings.function = 'sum'; // default to "Sum"
-					}
-					if ( settings.on.length == 0 ){
-						// since settings.on is not specified, we'll default to doing calculation for all rows/columns
-						if ( 'row' == me.getCardinality( key ) ){
-							$( table_selector + 'tr.' + key + ' td').each( function(){
-								settings.on.push( $(this).attr( 'class' ).match( /column-[0-9]+/ )[0] );
-							});
-						}
-						else{
-							$( table_selector + 'td.' + key ).each( function(){
-								settings.on.push( $(this).parents( 'tr' ).attr( 'class' ).match( /row-[0-9]+/ )[0] );
-							});
-						}
-					}
+					}					
 				});
 				
 				// Refactor Calculators - if we have multiple calculation lines in a single table, no need to add listeners
-				// for each on.  Make a single listener and perform all calculations there
+				// for each one.  Make a single listener and perform all calculations there
 				var selectors = [];
 				me.calculators[ field_id ] = {};
 				me.special_calculators[ field_id ] = [];
 				$.each( fields, function( key, settings ){
-					$.each( settings.on, function( index, on ){
-						if ( typeof me.calculators[ field_id ][ on ] == 'undefined' ){
-							me.calculators[ field_id ][ on ] = {};
+					$.each( settings.rows, function( row_index, row ){
+						$.each( settings.columns, function( col_index, column ){
+							var selector = '.' + row + ' .' + column;
+							if ( selectors.indexOf( selector ) == -1 ){
+								//selectors.push( selector );
+							}
+						});
+					});
+					
+					$.each( settings[ me.getOpposite( key ) + 's' ], function( index, selector ){
+						if ( typeof me.calculators[ field_id ][ selector ] == 'undefined' ){
+							me.calculators[ field_id ][ selector ] = {};
 						}
-						if ( selectors.indexOf( on ) == -1 ){
-							selectors.push( '.' + on );
+						me.calculators[ field_id ][ selector ][ key ] = settings;
+						if ( selectors.indexOf( selector ) == -1 ){
+							selectors.push( '.' + selector );
 						}
-						me.calculators[ field_id ][ on ][ key ] = settings;
 						
-						if ( typeof me.calculators[ field_id ][ key ] != 'undefined' && typeof me.calculators[ field_id ][ key ][ on ] != 'undefined' ){
+						if ( typeof me.calculators[ field_id ][ key ] != 'undefined' && typeof me.calculators[ field_id ][ key ][ selector ] != 'undefined' && me.calculators[ field_id ][ key ][ selector ][ 'function' ] == settings.function ){
 							// This is a case where a calculated column intersects with a calculated row.  We can handle that.  
-							me.special_calculators[ field_id ].push( me.getCardinality( on ) == 'row' ? { row: on, column: key } : { row: key, column: on } ); 
+							me.special_calculators[ field_id ].push( me.getOpposite( selector ) == 'column' ? { row: selector, column: key } : { row: key, column: selector } ); 
 						}
-					})
+					});
 				});
 				
 				$( table_selector ).on( me.keyup_event, selectors.join( ',' ), function(e){
@@ -92,13 +87,21 @@ jQuery( function($){
 								// this next line may look a little confusing, but it's just a compact way of calling a function
 								// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
 								// the value of settings.include_empty )
-								me[ settings.function ]( settings.include_empty ? inputs : inputs.not( function(){ return $(this).val() == ''; } ) )
+								me[ settings.function ]( inputs.filter( function(){
+									if ( !settings.include_empty && $(this).val() == '' ){
+										// easy
+										return false;
+									}
+									// trickier.  This is saying to return true if this input has a parent that matches the selectors given by getOpposite
+									return $(this).parentsUntil( 'table', '.' + settings[ me.getOpposite( classes[0] ) + 's' ].join( ', .' ) ).length > 0;
+								}))
 							, settings )
 						);
 					});
 					
 					$.each( me.special_calculators[ field_id ], function( index, calculator ){
 						var settings, target = table_selector + '.' + calculator.row + ' .' + calculator.column + ' input.calculation';
+
 						if ( classes[1] == 'column' ){
 							// We've just calculated a row ( based on inputs in a column )
 							inputs = $( table_selector + '.' + calculator.row + ' :input' ).not( function(){ return $(this).parents( 'td' ).hasClass( calculator.column ); } );
@@ -114,7 +117,14 @@ jQuery( function($){
 								// this next line may look a little confusing, but it's just a compact way of calling a function
 								// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
 								// the value of settings.include_empty )
-								me[ settings.function ]( settings.include_empty ? inputs : inputs.not( function(){ return $(this).val() == ''; } ) )
+								me[ settings.function ]( inputs.filter( function(){
+									if ( !settings.include_empty && $(this).val() == '' ){
+										// easy
+										return false;
+									}
+									// trickier.  This is saying to return true if this input has a parent that matches the selectors 
+									return $(this).parentsUntil( 'table', '.' + settings[ classes[1] + 's' ].join( ', .' ) ).length > 0;
+								}))
 							, settings )
 						);
 						
@@ -129,8 +139,8 @@ jQuery( function($){
 			});
 		},
 		
-		getCardinality: function( key ){
-			return key.match( /^(row|column)-[0-9]+$/ )[1]; // returns 'row' or 'column'
+		getOpposite: function( key ){ 
+			return ( key.match( /^(row|column)-[0-9]+$/ )[1] == 'row' ? 'column' : 'row' ); // returns 'row' or 'column'
 		},
 		
 		toFixed: function( number, settings ){

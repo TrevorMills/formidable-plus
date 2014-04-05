@@ -53,3 +53,8 @@
 .frm_form_fields:not(.frm_sample_form) .frmplus_options_form .datepicker-option{
 	margin-bottom:0.5em;
 }
+.frmplus_options_form .section{
+	border:1px solid #ccc;
+	padding:0.5em;
+	margin-bottom: 0.5em;
+}

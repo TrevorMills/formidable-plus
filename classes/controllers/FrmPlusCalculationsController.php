@@ -28,9 +28,6 @@ class FrmPlusCalculationsController{
 			$options = array();
 		}
 		
-		if ( !isset( $options['on'] ) ){
-			$options['on'] = array();
-		}
 		if ( !isset( $options['precision'] ) ){
 			$options['precision'] = 2;
 		}
@@ -45,6 +42,14 @@ class FrmPlusCalculationsController{
 		}
 		if ( isset( $options['forced'] ) ){
 			$options['forced'] = $options['forced'] == 'on';
+		}
+		foreach ( array( 'rows', 'columns' ) as $what ){
+			if ( !isset( $options[ "all_$what" ] ) ){
+				$options[ "all_$what" ] = true;
+			}
+			else{
+				$options[ "all_$what" ] = $options[ "all_$what" ] == 'yes';
+			}
 		}
 		return $options;
 	}
@@ -61,13 +66,15 @@ class FrmPlusCalculationsController{
 		<?php printf( __( 'Blah blah blah' ) ); ?>
 	</p>
 	<div class="calculation-option">
-		<label><?php _e( 'Function', FRMPLUS_PLUGIN_NAME ); ?>:</label>
-		<select name="frmplus_options[function]">
-			<?php foreach ( $this->available_calculations as $option ) : ?>
-				<option value="<?php echo $option; ?>" <?php selected( $option, $options['function'] ); ?>><?php echo __( ucwords( $option ), FRMPLUS_PLUGIN_NAME ); ?></option>
-			<?php endforeach; ?>
-		</select>
-		<div>
+		<div class="section">
+			<label><?php _e( 'Function', FRMPLUS_PLUGIN_NAME ); ?>:</label>
+			<select name="frmplus_options[function]">
+				<?php foreach ( $this->available_calculations as $option ) : ?>
+					<option value="<?php echo $option; ?>" <?php selected( $option, $options['function'] ); ?>><?php echo __( ucwords( $option ), FRMPLUS_PLUGIN_NAME ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</div>
+		<div class="section">
 			<label><?php _e( 'Precision:', FRMPLUS_PLUGIN_NAME ); ?></label>
 			<select name="frmplus_options[precision]">
 				<?php for( $p = 0; $p < 5; $p ++) : ?>
@@ -80,12 +87,33 @@ class FrmPlusCalculationsController{
 				<span class="frm_help frm_icon_font frm_tooltip_icon" title="" data-original-title="<?php echo esc_attr( __( 'If forced, then this number of decimals will always show.  Otherwise, they only show when non-zero.', FRMPLUS_PLUGIN_NAME ) ); ?>"></span>
 			</label>
 		</div>
-		<div>
+		<div class="section">
 			<?php _e( 'Include empty inputs in calculation?', FRMPLUS_PLUGIN_NAME ); ?>
 			<label><input type="radio" value="yes" name="frmplus_options[include_empty]" <?php checked( true, $options['include_empty'] ); ?>><?php _e( 'Yes', FRMPLUS_PLUGIN_NAME ); ?></label>
 			<label><input type="radio" value="no" name="frmplus_options[include_empty]" <?php checked( false, $options['include_empty'] ); ?>><?php _e( 'No', FRMPLUS_PLUGIN_NAME ); ?></label>
 		</div>
-		<div>
+		<?php foreach( array( 'rows', 'columns' ) as $what ) : ?>
+			<div class="section">
+				<div class="all_<?php echo $what; ?>">
+					<?php _e( 'Include all', FRMPLUS_PLUGIN_NAME ); ?> <?php _e( $what, FRMPLUS_PLUGIN_NAME ); ?>:
+					<label><input type="radio" value="yes" name="frmplus_options[<?php echo "all_{$what}"; ?>]" <?php checked( true, $options[ "all_{$what}" ] ); ?>><?php _e( 'Yes', FRMPLUS_PLUGIN_NAME ); ?></label>
+					<label><input type="radio" value="no" name="frmplus_options[<?php echo "all_{$what}"; ?>]" <?php checked( false, $options[ "all_{$what}" ] ); ?>><?php _e( 'No', FRMPLUS_PLUGIN_NAME ); ?></label>
+					<span class="frm_help frm_icon_font frm_tooltip_icon" title="" data-original-title="<?php echo esc_attr( sprintf( __( 'If there are %s that are not meant to be numeric, like a label or a date, then those %s should not be included in the calculation.', FRMPLUS_PLUGIN_NAME ), __( $what, FRMPLUS_PLUGIN_NAME ), __( $what, FRMPLUS_PLUGIN_NAME ) ) ); ?>"></span>
+				</div>
+				<div class="select_<?php echo $what; ?>" <?php if ( $options[ "all_{$what}" ] ) : ?>style="display:none"<?php endif; ?>>
+					<?php printf( __( 'Which %s should be included?', FRMPLUS_PLUGIN_NAME ), __( $what, FRMPLUS_PLUGIN_NAME ) ); ?>
+					<?php foreach ( $$what as $target => $opt ) : $label = FrmPlusFieldsHelper::parse_option( $opt, 'name' ); if ( substr( $what, 0, 3 ) == substr( $is_a, 0, 3 ) && FrmPlusFieldsHelper::parse_option( $opt, 'type' ) == 'calculation' ) continue; ?>
+						<div>
+							<label><input type="checkbox" name="frmplus_options[<?php echo $what; ?>][]" value="<?php echo $target; ?>" <?php checked( true, !isset( $options[$what] ) || in_array( $target, $options[$what] ) ); ?>> <?php echo $label; ?></label>
+						</div>
+					<?php endforeach; ?>
+				</div>
+			</div>
+		<?php endforeach; ?>
+			<?php /*?>
+		</div>
+		<div class="available_<?php echo $is_a; ?>s" <?php if ( $options[ "all_{$is_a}s" ] )>>
+		<div style="display:none">
 			<label><?php _e( 'Calculate these', FRMPLUS_PLUGIN_NAME ); ?> <?php $is_a == 'row' ? _e( 'Columns', FRMPLUS_PLUGIN_NAME ) : _e( 'Rows', FRMPLUS_PLUGIN_NAME ); ?></label>
 			<?php foreach ( ($is_a == 'row' ? $columns : $rows) as $target => $opt ) : $label = FrmPlusFieldsHelper::parse_option( $opt, 'name' ); ?>
 				<div>
@@ -93,6 +121,7 @@ class FrmPlusCalculationsController{
 				</div>
 			<?php endforeach; ?>
 		</div>
+		*/ ?>
 	</div>
 </div>
 		<?php
@@ -136,11 +165,29 @@ class FrmPlusCalculationsController{
 			$field = $frm_field->getOne( $field_id );
 			list( $columns, $rows ) = FrmPlusFieldsHelper::get_table_options( maybe_unserialize($field->options) );
 			foreach ( $table_fields as $key => $settings ){
-				foreach ( $settings['on'] as $index => $target ){
-					$particulars[ $field_id ][ $key ]['on'][ $index ] = substr( $target, 0, 3 ) == 'row' ? 'row-' . array_search( $target, array_keys( $rows ) ) : 'column-' . array_search( $target, array_keys( $columns ) );
+				foreach ( array( 'rows', 'columns' ) as $what ){
+					if ( $settings[ "all_$what" ] ){
+						$settings[ $what ] = array();
+						foreach ( array_keys( $$what ) as $index ){
+							$settings[ $what ][] = $index;
+						}
+					}
+					foreach ( $settings[ $what ] as $index => $target ){
+						$settings[ $what ][ $index ] = substr( $target, 0, 3 ) == 'row' ? 'row-' . array_search( $target, array_keys( $rows ) ) : 'column-' . array_search( $target, array_keys( $columns ) );
+					}
+					unset( $settings[ "all_$what" ] ); // not needed anymore
 				}
+				// @debug
+				if ( isset( $settings[ 'on' ] ) ){
+					unset( $settings[ 'on' ] );
+				}
+				if ( !isset( $settings[ 'function' ] ) ){
+					$settings[ 'function' ] = 'sum';
+				}
+				$particulars[ $field_id ][ $key ] = $settings;
 			}
 		}
+		echo '<pre>' . print_r( $particulars, true ) . '</pre>';
 		return $particulars;
 	}
 	

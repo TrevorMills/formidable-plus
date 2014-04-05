@@ -77,7 +77,14 @@ jQuery(function($){
 				})
 				.on( 'click', '.frmplus_options_form .cancel', function(){
 					$(this).parents( '.frm_single_option' ).find( '.frmplus_field_options' ).trigger( 'click' );
-				});
+				})
+				.on( 'change', '.frmplus_options_form input[name*="all_rows"]', function(){
+					$( this ).parents( '.all_rows' ).next( '.select_rows' ).slideToggle();
+				})
+				.on( 'change', '.frmplus_options_form input[name*="all_columns"]', function(){
+					$( this ).parents( '.all_columns' ).next( '.select_columns' ).slideToggle();
+				})
+				;
 		}
 	});
 	
