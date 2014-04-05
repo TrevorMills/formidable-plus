@@ -187,7 +187,6 @@ class FrmPlusCalculationsController{
 				$particulars[ $field_id ][ $key ] = $settings;
 			}
 		}
-		echo '<pre>' . print_r( $particulars, true ) . '</pre>';
 		return $particulars;
 	}
 	

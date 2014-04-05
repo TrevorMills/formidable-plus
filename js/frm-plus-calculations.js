@@ -38,15 +38,6 @@ jQuery( function($){
 				me.calculators[ field_id ] = {};
 				me.special_calculators[ field_id ] = [];
 				$.each( fields, function( key, settings ){
-					$.each( settings.rows, function( row_index, row ){
-						$.each( settings.columns, function( col_index, column ){
-							var selector = '.' + row + ' .' + column;
-							if ( selectors.indexOf( selector ) == -1 ){
-								//selectors.push( selector );
-							}
-						});
-					});
-					
 					$.each( settings[ me.getOpposite( key ) + 's' ], function( index, selector ){
 						if ( typeof me.calculators[ field_id ][ selector ] == 'undefined' ){
 							me.calculators[ field_id ][ selector ] = {};
