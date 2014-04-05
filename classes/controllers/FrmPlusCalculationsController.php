@@ -184,6 +184,9 @@ class FrmPlusCalculationsController{
 				if ( !isset( $settings[ 'function' ] ) ){
 					$settings[ 'function' ] = 'sum';
 				}
+				if ( count( $rows ) == 0 ){
+					$settings[ 'rows' ] = 'tr';
+				}
 				$particulars[ $field_id ][ $key ] = $settings;
 			}
 		}

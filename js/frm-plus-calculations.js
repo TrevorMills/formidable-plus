@@ -23,13 +23,33 @@ jQuery( function($){
 		
 		init: function(){
 			$.each( me.particulars, function( field_id, fields ){
-				var table_selector = '#frm-table-' + field_id + ' ';
-				
+				var table_selector = me.getTableSelector( field_id );
+
 				// Sanitize Settings
-				$.each( fields, function( key, settings ){
+				$.each( fields, function( key, settings ){					
 					if ( typeof settings.function == 'undefined' ){
 						settings.function = 'sum'; // default to "Sum"
-					}					
+					}		
+					if ( settings.rows == 'tr' ){
+						// It's a dynamic table set it up to contain the rows in the actual table
+						settings.rows = [];
+						$( table_selector + 'tbody tr' ).each( function(){
+							settings.rows.push( $(this).attr( 'class' ).match( /row-[0-9]+/ )[0] );
+						});
+						
+						$( table_selector ).on( 'add_row', function( e, field_id, tr){
+							var selector = tr.attr( 'class' ).match( /row-[0-9]+/ )[0];
+							if ( !tr.data( 'listener-added' ) ){
+								tr.data( 'listener-added', true ); // only need to add this listener for the new row once.  This only kicks in if there is more than one calculation column
+								$(this).on( me.keyup_event, '.' + selector, { field_id: field_id }, me.keyupListener );
+							}
+
+							if ( typeof me.calculators[ field_id ][ selector ] == 'undefined' ){
+								me.calculators[ field_id ][ selector ] = {};
+							}
+							me.calculators[ field_id ][ selector ][ key ] = settings;
+						});
+					}			
 				});
 				
 				// Refactor Calculators - if we have multiple calculation lines in a single table, no need to add listeners
@@ -54,84 +74,93 @@ jQuery( function($){
 					});
 				});
 				
-				$( table_selector ).on( me.keyup_event, selectors.join( ',' ), function(e){
-					if ( $(e.target).hasClass( 'calculation' ) ){
-						// original target is a calculation field.  No further action required
-						return;
-					}
-					
-					// loop through all of the calculators for this selector
-					var classes = $(this).attr( 'class' ).match( /(row|column)-[0-9]+/ ),
-						inputs = $( table_selector + '.' + classes[0] + ' :input' ).not( '.calculation' );
-						
-					$.each( me.calculators[ field_id ][ classes[0] ], function( key, settings ){
-						var target = table_selector;
-						if ( classes[1] == 'row' )
-							target += '.' + classes[0] + ' .' + key; // row must always come first in the target_input_selector
-						else
-							target += '.' + key + ' .' + classes[0];
-						
-						target += ' input.calculation';	
-						
-						$( target ).val(
-							me.toFixed( 
-								// this next line may look a little confusing, but it's just a compact way of calling a function
-								// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
-								// the value of settings.include_empty )
-								me[ settings.function ]( inputs.filter( function(){
-									if ( !settings.include_empty && $(this).val() == '' ){
-										// easy
-										return false;
-									}
-									// trickier.  This is saying to return true if this input has a parent that matches the selectors given by getOpposite
-									return $(this).parentsUntil( 'table', '.' + settings[ me.getOpposite( classes[0] ) + 's' ].join( ', .' ) ).length > 0;
-								}))
-							, settings )
-						);
-					});
-					
-					$.each( me.special_calculators[ field_id ], function( index, calculator ){
-						var settings, target = table_selector + '.' + calculator.row + ' .' + calculator.column + ' input.calculation';
-
-						if ( classes[1] == 'column' ){
-							// We've just calculated a row ( based on inputs in a column )
-							inputs = $( table_selector + '.' + calculator.row + ' :input' ).not( function(){ return $(this).parents( 'td' ).hasClass( calculator.column ); } );
-							settings = me.calculators[ field_id ][ calculator.column ][ calculator.row ];
-						}
-						else{
-							inputs = $( table_selector + '.' + calculator.column + ' :input' ).not( function(){ return $(this).parents( 'tr' ).hasClass( calculator.row ); } );
-							settings = me.calculators[ field_id ][ calculator.row ][ calculator.column ];
-						}
-						
-						$( target ).data( 'result-' + classes[1], 
-							me.toFixed( 
-								// this next line may look a little confusing, but it's just a compact way of calling a function
-								// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
-								// the value of settings.include_empty )
-								me[ settings.function ]( inputs.filter( function(){
-									if ( !settings.include_empty && $(this).val() == '' ){
-										// easy
-										return false;
-									}
-									// trickier.  This is saying to return true if this input has a parent that matches the selectors 
-									return $(this).parentsUntil( 'table', '.' + settings[ classes[1] + 's' ].join( ', .' ) ).length > 0;
-								}))
-							, settings )
-						);
-						
-						if ( $( target ).data( 'result-row' ) == $( target ).data( 'result-column' ) ){
-							$( target ).val( $( target ).data( 'result-row' ) );
-						}
-						else{
-							$( target ).val( $( target ).data( 'result-row' ) + ' ' + me.__.column_indicator + ' ' + $( target ).data( 'result-column' ) + ' ' + me.__.row_indicator );
-						}
-					});
-				}); 
+				$( table_selector ).on( me.keyup_event, selectors.join( ',' ), { field_id: field_id }, me.keyupListener);
 			});
+		},
+		
+		getTableSelector: function( field_id ){
+			return '#frm-table-' + field_id + ' ';
 		},
 		
 		getOpposite: function( key ){ 
 			return ( key.match( /^(row|column)-[0-9]+$/ )[1] == 'row' ? 'column' : 'row' ); // returns 'row' or 'column'
+		},
+		
+		keyupListener: function( e ){
+			console.log( 'here' );
+			if ( $(e.target).hasClass( 'calculation' ) ){
+				// original target is a calculation field.  No further action required
+				return;
+			}
+			
+			// loop through all of the calculators for this selector
+			var field_id = e.data.field_id,
+				table_selector = me.getTableSelector( field_id ),
+				classes = $(this).attr( 'class' ).match( /(row|column)-[0-9]+/ ),
+				inputs = $( table_selector + '.' + classes[0] + ' :input' ).not( '.calculation' );
+				
+			$.each( me.calculators[ field_id ][ classes[0] ], function( key, settings ){
+				var target = table_selector;
+				if ( classes[1] == 'row' )
+					target += '.' + classes[0] + ' .' + key; // row must always come first in the target_input_selector
+				else
+					target += '.' + key + ' .' + classes[0];
+				
+				target += ' input.calculation';	
+				
+				$( target ).val(
+					me.toFixed( 
+						// this next line may look a little confusing, but it's just a compact way of calling a function
+						// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
+						// the value of settings.include_empty )
+						me[ settings.function ]( inputs.filter( function(){
+							if ( !settings.include_empty && $(this).val() == '' ){
+								// easy
+								return false;
+							}
+							// trickier.  This is saying to return true if this input has a parent that matches the selectors given by getOpposite
+							return $(this).parentsUntil( 'table', '.' + settings[ me.getOpposite( classes[0] ) + 's' ].join( ', .' ) ).length > 0;
+						}))
+					, settings )
+				);
+			});
+			
+			$.each( me.special_calculators[ field_id ], function( index, calculator ){
+				var settings, target = table_selector + '.' + calculator.row + ' .' + calculator.column + ' input.calculation';
+
+				if ( classes[1] == 'column' ){
+					// We've just calculated a row ( based on inputs in a column )
+					inputs = $( table_selector + '.' + calculator.row + ' :input' ).not( function(){ return $(this).parents( 'td' ).hasClass( calculator.column ); } );
+					settings = me.calculators[ field_id ][ calculator.column ][ calculator.row ];
+				}
+				else{
+					inputs = $( table_selector + '.' + calculator.column + ' :input' ).not( function(){ return $(this).parents( 'tr' ).hasClass( calculator.row ); } );
+					settings = me.calculators[ field_id ][ calculator.row ][ calculator.column ];
+				}
+				
+				$( target ).data( 'result-' + classes[1], 
+					me.toFixed( 
+						// this next line may look a little confusing, but it's just a compact way of calling a function
+						// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
+						// the value of settings.include_empty )
+						me[ settings.function ]( inputs.filter( function(){
+							if ( !settings.include_empty && $(this).val() == '' ){
+								// easy
+								return false;
+							}
+							// trickier.  This is saying to return true if this input has a parent that matches the selectors 
+							return $(this).parentsUntil( 'table', '.' + settings[ classes[1] + 's' ].join( ', .' ) ).length > 0;
+						}))
+					, settings )
+				);
+				
+				if ( $( target ).data( 'result-row' ) == $( target ).data( 'result-column' ) ){
+					$( target ).val( $( target ).data( 'result-row' ) );
+				}
+				else{
+					$( target ).val( $( target ).data( 'result-row' ) + ' ' + me.__.column_indicator + ' ' + $( target ).data( 'result-column' ) + ' ' + me.__.row_indicator );
+				}
+			});
 		},
 		
 		toFixed: function( number, settings ){
