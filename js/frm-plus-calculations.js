@@ -87,7 +87,6 @@ jQuery( function($){
 		},
 		
 		keyupListener: function( e ){
-			console.log( 'here' );
 			if ( $(e.target).hasClass( 'calculation' ) ){
 				// original target is a calculation field.  No further action required
 				return;
