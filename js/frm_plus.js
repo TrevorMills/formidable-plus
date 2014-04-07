@@ -83,6 +83,9 @@ add_row = function(field_id){
 				jQuery('#frmplus-add-row-'+field_id).removeClass('loading');
 			}
 			jQuery('#frm-table-' + field_id + ' tr:last').after(msg);
+			if(jQuery('#frm-table-' + field_id + ' tr:last .frm_chzn').length && jQuery().chosen)
+				jQuery('#frm-table-' + field_id + ' tr:last .frm_chzn').chosen(); // @todo - bug here on dynamic fields.  To see: add row, add row, delete row 2, add row - newly added row will not be .chosen()
+				
 			post_add_row(field_id,jQuery('#frm-table-' + field_id + ' tr:last')); // deprecated.  Use the event below
 			jQuery('#frm-table-' + field_id).trigger('add_row',[field_id,jQuery('#frm-table-' + field_id + ' tr:last')]);
 		}

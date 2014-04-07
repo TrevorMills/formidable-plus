@@ -59,7 +59,11 @@
 	background:url(images/ajax_loader.gif) 100% 50% no-repeat;
 }
 .with_frm_style .frm-table input.calculation,
-.frm-table input.calculation
+.frm-table input.calculation,
+.with_frm_style .frm-table input.readonly,
+.frm-table input.readonly,
+.with_frm_style .frm-table input.calculation:focus,
+.with_frm_style .frm-table input.readonly:focus
 {
 	background:transparent;
 	opacity: 1;

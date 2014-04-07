@@ -264,6 +264,7 @@ class FrmPlusFieldsController{
         $field['field_key'] = $field_data->field_key;
         $field['type'] = $field_data->type;
         $field['id'] = $field_id;
+		$field['options'] = $field_data->options;
         $field_name = "item_meta[$field_id]";
 		ob_start();
 		require(FRMPLUS_VIEWS_PATH.'/frmplus-fields/table-row.php');
