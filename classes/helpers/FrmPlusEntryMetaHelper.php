@@ -140,7 +140,7 @@ class FrmPlusEntryMetaHelper{
 				$entries[$entry_id] = $frm_entry->getOne($entry_id,true);
 			}
 			$entry = $entries[$entry_id];
-			if ( !$entry ){
+			if ( !$entry || !isset( $entry->metas[$field_id] ) ){
 				return null;
 			}
 			$value = maybe_unserialize($entry->metas[$field_id]);

@@ -12,7 +12,7 @@
 	?>
 		<select class="frmplus_field_type" id="field_<?php echo $field['id']?>-<?php echo $opt_key ?>-type">
 			<?php foreach ( FrmPlusFieldsHelper::get_types( 'valid' ) as $available_type ) : ?>
-				<option value="<?php echo $available_type; ?>" <?php selected( $type, $available_type ); ?>><?php echo __( ucwords($available_type ), FRMPLUS_PLUGIN_NAME ); ?></option>
+				<option value="<?php echo $available_type; ?>" <?php selected( $type, $available_type ); ?>><?php echo __( ucwords( str_replace( '_', ' ', $available_type ) ), FRMPLUS_PLUGIN_NAME ); ?></option>
 			<?php endforeach; ?>
 		</select>
 		<span class="frmplus_field_options icon16" id="field_<?php echo $field['id']?>-<?php echo $opt_key ?>-options" <?php echo ( in_array( $type, FrmPlusFieldsHelper::get_types( 'with_options' ) ) ? '' : 'style="display:none"' ); ?>></span>
