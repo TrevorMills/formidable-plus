@@ -206,8 +206,9 @@ class FrmPlusFieldsController{
 				if ( is_array( $options['frmplus_options'] ) ){
 					$options = $options['frmplus_options'];
 				}
-				else{
-					$options = explode( "\n", str_replace( "\r", '', $options['frmplus_options']) );
+				
+				if ( isset( $options['options'] ) && !is_array( $options['options'] ) ){
+					$options['options'] = explode( "\n", str_replace( "\r", '', $options['options']) );
 				}
 				break;
 			case 'name':

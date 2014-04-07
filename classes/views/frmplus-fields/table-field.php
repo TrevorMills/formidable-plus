@@ -45,14 +45,17 @@ else {
 	$options = apply_filters('frmplus_field_options',$options,$field,$name,$row_num,$col_num); // Give filters the option of filtering on row/col or name of option or combination
 	$this_field_id = "field_{$field['field_key']}_{$row_num}_{$col_num}";
 	$this_field_name = sprintf( '%s[%s]', $field_name, $row_num );
-	// strangeness, but okay, kinda makes sense.  
+	if ( !isset( $options['options'] ) ){
+		$options['options'] = array();
+	}
+	
 	switch($type){ 
 	case 'textarea':
 		echo '<textarea id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" class="auto_width table-cell">'.htmlspecialchars($value).'</textarea>'."\n";
 		break;
 	case 'radio':
-		if (count($options)){
-			foreach($options as $option_num => $option){
+		if (count($options['options'])){
+			foreach($options['options'] as $option_num => $option){
 				echo '<input type="radio" class="radio table-cell id-has-option" id="'.$this_field_id.'_'.$option_num.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr($option).'" '.checked($value,$option,false).' /><label for="'.$this_field_id.'_'.$option_num.'">'.$option.'</label>'."\n";
 			}
 		}
@@ -75,16 +78,32 @@ else {
 		}
 		break;
 	case 'select':
-		echo '<select id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" class="table-cell">'."\n";
-		echo '<option value="" '.selected($value,'',false).'>&nbsp;</option>'."\n";
-		foreach ($options as $option){
+		if ( isset( $options['multiselect'] ) && $options['multiselect'] )
+			$multiple = 'multiple data-placeholder=" "';
+		else
+			$multiple = '';
+		
+		if ( isset( $options['autocom'] ) && $options['autocom'] ){
+	        global $frm_vars;
+	        $frm_vars['chosen_loaded'] = true;
+			$frm_chzn = 'frm_chzn';
+		}
+		else{
+			$options['autocom'] = false;
+			$frm_chzn = '';
+		}
+		echo "<select id=\"$this_field_id\" $multiple name=\"{$this_field_name}[$col_num]\" class=\"table-cell $frm_chzn\">\n";
+		if ( !$multiple ){
+			echo '<option value="" '.selected($value,'',false).'>&nbsp;</option>'."\n";
+		}
+		foreach ($options['options'] as $option){
 			echo '<option value="'.esc_attr($option).'" '.selected($value,$option,false).'>'.$option.'</option>'."\n";
 		}
 		echo '</select>'."\n";
 		break;
 	case 'checkbox':
-		if (count($options)){
-			foreach ($options as $option_num => $option){
+		if (count($options['options'])){
+			foreach ($options['options'] as $option_num => $option){
 				echo '<input type="checkbox" id="'.$this_field_id.'_'.$option_num.'" name="'.$this_field_name.'['.$col_num.'][]" class="checkbox table-cell id-has-option" value="'.esc_attr($option).'" '.checked(in_array($option,(array)$value),true,false).' /><label for="'.$this_field_id.'_'.$option_num.'">'.$option.'</label>'."\n";
 			}
 		}

@@ -310,13 +310,13 @@ class FrmPlusFieldsHelper{
 				$name = $matches[2];
 				$options = array();
 			}			
+			$options = array( 'options' => $options );
 		}
 		else{
 			$name = $opt;
 			$type = 'text';
 			$options = array();
 		}
-		
 		switch($return){
 		case 'type':
 			return $type;
@@ -404,10 +404,19 @@ class FrmPlusFieldsHelper{
 			if ( !isset( $lambda ) ){
 				$lambda = create_function( '$a', 'return !is_array( $a ); ');
 			}
-			$options = array_filter( $options, $lambda ); // remove members that are an array so we don't get Array\nArray as the values.
+			if ( !isset( $options['options'] ) ){
+				$options['options'] = array();
+			}
+			$options['options'] = array_filter( $options['options'], $lambda ); // remove members that are an array so we don't get Array\nArray as the values.
 			?>
 <p class="description"><?php _e( 'Enter one option per line', FRMPLUS_PLUGIN_NAME ); ?>:</p>
-<textarea rows="10" name="frmplus_options"><?php echo implode( "\n", $options ); ?></textarea>
+<textarea rows="10" name="frmplus_options[options]"><?php echo implode( "\n", $options['options'] ); ?></textarea>
+<?php if ( $type == 'select' ) : ?>
+	<div class="section">
+		<label><input type="checkbox" name="frmplus_options[multiselect]" value="on" <?php checked( 'on', isset($options['multiselect']) ? $options['multiselect'] : false ); ?>><?php _e( 'enable multiselect', FRMPLUS_PLUGIN_NAME ); ?></label>
+		<label><input type="checkbox" name="frmplus_options[autocom]" value="on" <?php checked( 'on', isset($options['autocom']) ? $options['autocom'] : false ); ?>><?php _e( 'enable autocomplete', FRMPLUS_PLUGIN_NAME ); ?></label>
+	</div>
+<?php endif; ?>
 			<?php
 		}
 		return ob_get_clean();

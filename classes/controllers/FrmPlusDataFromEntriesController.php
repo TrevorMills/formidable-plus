@@ -171,7 +171,7 @@ jQuery( function($){
 		        $frm_vars['chosen_loaded'] = true;
 			}
 			if ( is_array( $value ) ) $value = reset( $value ); ?>
-			<select class="<?php echo ( $options['autocom'] ? 'frm_chzn' : '' ); ?>" <?php echo ( $options['multiselect'] ? 'multiple' : '' ); ?> name="<?php echo "{$this_field_name}[$col_num]"; ?>" id="<?php echo $this_field_id; ?>">
+			<select class="<?php echo ( $options['autocom'] ? 'frm_chzn' : '' ); ?>" <?php echo ( $options['multiselect'] ? 'multiple data-placeholder=" "' : '' ); ?> name="<?php echo "{$this_field_name}[$col_num]"; ?>" id="<?php echo $this_field_id; ?>">
 				<?php foreach ( $values as $v ) : if ( $options['multiselect'] && $v == '' ) continue; ?>
 				<option value="<?php echo esc_attr( $v ); ?>" <?php selected( $v, $value ); ?>><?php echo $v; ?></option>
 				<?php endforeach; ?>

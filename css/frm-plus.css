@@ -13,10 +13,12 @@
 .frm-table select{
 	width:auto !important;
 }
+.frm-table select.frm_chzn{
+	min-width:100px;
+}
 .form-wrap .frm-table label{
 	display: inline;
 }
-
 .frmplus-wrapper p{
 	margin-top:5px;
 	margin-bottom:0px;
