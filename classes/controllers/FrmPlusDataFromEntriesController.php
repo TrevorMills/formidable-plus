@@ -190,6 +190,9 @@ jQuery( function($){
 		}
 		switch ( $options['display'] ){
 		case 'select': 
+			if ( is_admin() && !defined( 'DOING_AJAX' ) ){
+				$options['autocom'] = false;
+			}
 			if ( $options['autocom'] ){
 		        global $frm_vars;
 		        $frm_vars['chosen_loaded'] = true;
