@@ -83,6 +83,9 @@ else {
 		else
 			$multiple = '';
 		
+		if ( is_admin() && !defined( 'DOING_AJAX' ) ){
+			$options['autocom'] = false;
+		}
 		if ( isset( $options['autocom'] ) && $options['autocom'] ){
 	        global $frm_vars;
 	        $frm_vars['chosen_loaded'] = true;

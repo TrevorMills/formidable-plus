@@ -93,7 +93,11 @@ class FrmPlusEntryMetaHelper{
 			if ($strip){
 				$value = stripslashes_deep($value);
 			}
-			$value = array_map('html_entity_decode',$value);
+			foreach ( $value as $k => $v ){
+				if ( is_string( $v ) ){
+					$value[$k] = html_entity_decode( $v );
+				}
+			}
 			$value = array_map('maybe_unserialize',$value);
 		}
 		

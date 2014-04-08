@@ -43,6 +43,10 @@ adjust_row_numbers = function(field_id){
 					id = id.replace(/_[0-9]+(_[0-9]+)$/,'_' + row_num + '$1');
 				}
 				jQuery(this).attr('id',id);
+				if ( jQuery(this).hasClass( 'frm_chzn' ) ){
+					jQuery(this).removeClass( 'chzn-done' ).next( '.chzn-container' ).remove();
+					jQuery(this).chosen();
+				}
 			});
 			
 			// For columnar radiolines
@@ -84,7 +88,7 @@ add_row = function(field_id){
 			}
 			jQuery('#frm-table-' + field_id + ' tr:last').after(msg);
 			if(jQuery('#frm-table-' + field_id + ' tr:last .frm_chzn').length && jQuery().chosen)
-				jQuery('#frm-table-' + field_id + ' tr:last .frm_chzn').chosen(); // @todo - bug here on dynamic fields.  To see: add row, add row, delete row 2, add row - newly added row will not be .chosen()
+				jQuery('#frm-table-' + field_id + ' tr:last .frm_chzn').data('chosen',true).chosen({destroy:true}).chosen(); 
 				
 			post_add_row(field_id,jQuery('#frm-table-' + field_id + ' tr:last')); // deprecated.  Use the event below
 			jQuery('#frm-table-' + field_id).trigger('add_row',[field_id,jQuery('#frm-table-' + field_id + ' tr:last')]);

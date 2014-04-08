@@ -66,6 +66,7 @@ class FrmPlusDataFromEntriesController{
 			<label><?php _e( 'Import Data from', FRMPLUS_PLUGIN_NAME ); ?></label><br/>
 			<select name="frmplus_options[source][form]" class="select-form">
 				<option value="">--<?php _e( 'Select Form', FRMPLUS_PLUGIN_NAME ); ?>--</option>
+				<option value="taxonomy" <?php selected( 'taxonomy', $options['source']['form'] ); ?>><?php _e('Use a Category/Taxonomy', FRMPLUS_PLUGIN_NAME ); ?></option>
 				<?php foreach( $forms as $form ) : ?>
 					<option value="<?php echo $form->id; ?>" <?php selected( $form->id, $options['source']['form'] ); ?>><?php echo $form->name; ?></option>
 				<?php endforeach; ?>
@@ -116,19 +117,33 @@ jQuery( function($){
 			extract( $_POST );
 		}
 
-        global $frm_field;
-        $fields = $frm_field->getAll(array('fi.form_id' => (int)$form_id, 'field_order') ); 
-		if ( !isset( $field_id ) ){
-			$field_id = false;
+		if ( 'taxonomy' === $form_id ){
+			$fields = false;
+			$taxonomies = get_taxonomies(array( 'public' => true ), 'objects');
 		}
-		ob_start();
-		if ( $fields ) : ?>
-		<select name="frmplus_options[source][field]">
-			<option value="">--<?php _e( 'Select Field', FRMPLUS_PLUGIN_NAME ); ?>--</option>
-			<?php foreach ( $fields as $field ) : ?>
-				<option value="<?php echo $field->id; ?>" <?php selected( $field->id, $field_id ); ?>><?php echo $field->name; ?></option>
-			<?php endforeach; ?>
-		</select>
+		else{
+	        global $frm_field;
+	        $fields = $frm_field->getAll(array('fi.form_id' => (int)$form_id, 'field_order') ); 
+			$taxonomies = false;
+			if ( !isset( $field_id ) ){
+				$field_id = false;
+			}
+		}
+		ob_start(); 
+		if ( $fields || $taxonomies ) :?>
+			<select name="frmplus_options[source][field]">
+			<?php if ( $fields ) : ?>
+				<option value="">--<?php _e( 'Select Field', FRMPLUS_PLUGIN_NAME ); ?>--</option>
+				<?php foreach ( $fields as $field ) : ?>
+					<option value="<?php echo $field->id; ?>" <?php selected( $field->id, $field_id ); ?>><?php echo $field->name; ?></option>
+				<?php endforeach; ?>
+			<?php elseif ( $taxonomies ) : ?>
+				<option value="">--<?php _e( 'Select Taxonomy', FRMPLUS_PLUGIN_NAME ); ?>--</option>
+				<?php foreach ( $taxonomies as $key => $taxonomy ) : ?>
+					<option value="<?php echo $key; ?>" <?php selected( $key, $field_id ); ?>><?php echo $taxonomy->label; ?></option>
+				<?php endforeach; ?>
+			<?php endif; ?>
+			</select>
 		<?php endif;
 		
 		$buffer = ob_get_clean();
@@ -149,23 +164,35 @@ jQuery( function($){
 			return;
 		}
 		
-		$values = array(
-			'form_select' => $options['source']['field'],
-			'hide_field' => false,
-			'hide_opt' => false,
-			'restrict' => $options['restrict']
-		);
-		global $frm_field;
-		$field = $frm_field->getOne( $options['source']['field'] );
-		
-		if ( isset( $entry_id ) ){
-			$values = FrmProFieldsHelper::get_linked_options( $values, $field, $entry_id );
+		if ( 'taxonomy' === $options['source']['form'] ){
+			$terms = get_terms( $options['source']['field'], array( 'hide_empty' => false ) );
+			$values = array( '' => ' ' );
+			foreach ( $terms as $term ){
+				$values[ $term->term_id ] = $term->name;
+			}
 		}
 		else{
-			$values = FrmProFieldsHelper::get_linked_options( $values, $field );
+			$values = array(
+				'form_select' => $options['source']['field'],
+				'hide_field' => false,
+				'hide_opt' => false,
+				'restrict' => $options['restrict']
+			);
+			global $frm_field;
+			$field = $frm_field->getOne( $options['source']['field'] );
+		
+			if ( isset( $entry_id ) ){
+				$values = FrmProFieldsHelper::get_linked_options( $values, $field, $entry_id );
+			}
+			else{
+				$values = FrmProFieldsHelper::get_linked_options( $values, $field );
+			}
 		}
 		switch ( $options['display'] ){
 		case 'select': 
+			if ( is_admin() && !defined( 'DOING_AJAX' ) ){
+				$options['autocom'] = false;
+			}
 			if ( $options['autocom'] ){
 		        global $frm_vars;
 		        $frm_vars['chosen_loaded'] = true;
@@ -180,13 +207,13 @@ jQuery( function($){
 			break;
 		case 'checkbox': ?>
 				<?php foreach ( $values as $option_num => $v ) : if ( $v == '' ) continue; ?>
-					<label><input type="checkbox" name="<?php echo "{$this_field_name}[$col_num][]"; ?>" value="<?php echo esc_attr( $v ); ?>" id="<?php echo "{$this_field_id}_{$option_num}"; ?>" <?php checked( true, $v == $value || ( is_array( $value ) && in_array( $v, $value ) ) ); ?>><?php echo $v; ?></label>
+					<label><input type="checkbox" name="<?php echo "{$this_field_name}[$col_num][]"; ?>" value="<?php echo esc_attr( $v ); ?>" class="checkbox table-cell id-has-option" id="<?php echo "{$this_field_id}_{$option_num}"; ?>" <?php checked( true, $v == $value || ( is_array( $value ) && in_array( $v, $value ) ) ); ?>><?php echo $v; ?></label>
 				<?php endforeach; ?>
 		<?php
 			break;
 		case 'radio': ?>
 				<?php foreach ( $values as $option_num => $v ) : if ( $v == '' ) continue; ?>
-					<label><input type="radio" name="<?php echo "{$this_field_name}[$col_num]"; ?>" value="<?php echo esc_attr( $v ); ?>" id="<?php echo "{$this_field_id}_{$option_num}"; ?>" <?php checked( true, $v == $value || ( is_array( $value ) && in_array( $v, $value ) ) ); ?>><?php echo $v; ?></label>
+					<label><input type="radio" name="<?php echo "{$this_field_name}[$col_num]"; ?>" value="<?php echo esc_attr( $v ); ?>" class="radio table-cell id-has-option" id="<?php echo "{$this_field_id}_{$option_num}"; ?>" <?php checked( true, $v == $value || ( is_array( $value ) && in_array( $v, $value ) ) ); ?>><?php echo $v; ?></label>
 				<?php endforeach; ?>
 		<?php
 			break;
