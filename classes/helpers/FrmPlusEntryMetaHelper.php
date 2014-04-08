@@ -196,12 +196,27 @@ class FrmPlusEntryMetaHelper{
 				$tmp = array();
 				$tmp_index = 0;
 				if (count($rows)){
-					$tmp[$tmp_index++] = FrmPlusFieldsHelper::parse_option(current($rows),'name');
+					$row_opt = current($rows);
+					$tmp[$tmp_index++] = FrmPlusFieldsHelper::parse_option($row_opt,'name');
 					next($rows);
 				}
+				else{
+					$row_opt = null;
+				}
 				for ($index = 0; $index < count($columns); $index++){
+					list($type,$name,$options,$precedence) = FrmPlusFieldsHelper::parse_with_precedence($row_opt,$columns[ array_keys( $columns )[$index] ]);
+					
 					if (!isset($row_data[$index])){
 						$tmp[$tmp_index] = '';
+					}
+					elseif ( has_action( "frmplus_field_value_$type" ) ){
+						ob_start();
+						do_action( "frmplus_field_value_$type", array( 
+							'field' => $args['field'], 
+							'value' => $row_data[$index],
+							'options' => $options,
+						));
+						$tmp[$tmp_index] = ob_get_clean();
 					}
 					elseif(is_array($row_data[$index])){
 						$tmp[$tmp_index] = implode(', ',$row_data[$index]);

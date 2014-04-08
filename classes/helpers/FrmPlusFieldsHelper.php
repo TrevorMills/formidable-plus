@@ -78,6 +78,9 @@ class FrmPlusFieldsHelper{
 		if ( isset( $render_callback ) && is_callable( $render_callback ) ){
 			add_action( "frmplus_field_input_$type", $render_callback );
 		}
+		if ( isset( $display_callback ) && is_callable( $display_callback ) ){
+			add_action( "frmplus_field_value_$type", $display_callback );
+		}
 	}
 	
 	public static function unregister_type( $type ){

@@ -10,7 +10,8 @@ class FrmPlusDataFromEntriesController{
 			'type' => 'data_from_entries',
 			'has_options' => true,
 			'options_callback' => array( &$this, 'options_callback' ),
-			'render_callback' => array( &$this, 'render_callback' )
+			'render_callback' => array( &$this, 'render_callback' ),
+			'display_callback' => array( &$this, 'display_callback' )
 		));
 	}
 	
@@ -156,6 +157,50 @@ jQuery( function($){
 		}
 	}
 	
+	public function get_data_values( $options, $entry_id = null ){
+		static $values_cache;
+		if ( !isset( $values_cache ) ){
+			$values_cache = array();
+		}
+		if ( !isset( $values_cache[ $options['source']['form'] ] ) ){
+			$values_cache[ $options['source']['form'] ] = array();
+		}
+		$cache = & $values_cache[ $options['source']['form'] ][ $options['source']['field'] ]; // shorthand
+		
+		if ( isset( $cache ) ){
+			$values = $cache;
+		}
+		else{
+			if ( 'taxonomy' === $options['source']['form'] ){
+				$terms = get_terms( $options['source']['field'], array( 'hide_empty' => false ) );
+				$values = array( '' => '' );
+				foreach ( $terms as $term ){
+					$values[ $term->term_id ] = $term->name;
+				}
+			}
+			else{
+				$values = array(
+					'form_select' => $options['source']['field'],
+					'hide_field' => false,
+					'hide_opt' => false,
+					'restrict' => $options['restrict']
+				);
+				global $frm_field;
+				$field = $frm_field->getOne( $options['source']['field'] );
+		
+				if ( isset( $entry_id ) ){
+					$values = FrmProFieldsHelper::get_linked_options( $values, $field, $entry_id );
+				}
+				else{
+					$values = FrmProFieldsHelper::get_linked_options( $values, $field );
+				}
+			}
+			
+			$cache = $values;
+		}
+		return $values;
+	}
+	
 	public function render_callback( $args ){
 		extract( $args );
 		$options = $this->massageOptions( $options );
@@ -164,30 +209,7 @@ jQuery( function($){
 			return;
 		}
 		
-		if ( 'taxonomy' === $options['source']['form'] ){
-			$terms = get_terms( $options['source']['field'], array( 'hide_empty' => false ) );
-			$values = array( '' => '' );
-			foreach ( $terms as $term ){
-				$values[ $term->term_id ] = $term->name;
-			}
-		}
-		else{
-			$values = array(
-				'form_select' => $options['source']['field'],
-				'hide_field' => false,
-				'hide_opt' => false,
-				'restrict' => $options['restrict']
-			);
-			global $frm_field;
-			$field = $frm_field->getOne( $options['source']['field'] );
-		
-			if ( isset( $entry_id ) ){
-				$values = FrmProFieldsHelper::get_linked_options( $values, $field, $entry_id );
-			}
-			else{
-				$values = FrmProFieldsHelper::get_linked_options( $values, $field );
-			}
-		}
+		$values = $this->get_data_values( $options, $entry_id );
 		switch ( $options['display'] ){
 		case 'select': 
 			if ( is_admin() && !defined( 'DOING_AJAX' ) ){
@@ -218,6 +240,22 @@ jQuery( function($){
 		<?php
 			break;
 		}
+	}
+	
+	public function display_callback( $args ){
+		extract( $args );
+		$options = $this->massageOptions( $options );
+		
+		if ( !is_array( $value ) ){
+			$value = array_filter( array( $value ) );
+		}
+		if ( isset( $options['source'] ) && isset( $options['source']['form'] ) && isset( $options['source']['field'] ) ){
+			$values = $this->get_data_values( $options, $entry_id );
+			foreach ( $value as $k => $v ){
+				$value[ $k ] = $values[ $v ];
+			}
+		}
+		echo implode( ', ', $value );
 	}
 	
 }

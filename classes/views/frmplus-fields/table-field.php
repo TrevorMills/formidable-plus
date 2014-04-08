@@ -20,15 +20,25 @@ if ( isset( $field['value'] ) && is_array($field['value']) and array_key_exists(
 } 	
 ?>
 <?php 
+list($type,$name,$options,$precedence) = FrmPlusFieldsHelper::parse_with_precedence((count($rows) ? $opt : null),$col_opt);
+$options = apply_filters('frmplus_field_options',$options,$field,$name,$row_num,$col_num); // Give filters the option of filtering on row/col or name of option or combination
+if ( !isset( $options['options'] ) ){
+	$options['options'] = array();
+}
 if ( isset( $display_only ) && $display_only == true) {
-	if (is_array($value)){
-		echo implode(', ',$value);
-	}
-	elseif ($value == ''){
-		echo '&nbsp;';
+	if ( has_action( 'frmplus_field_value_' . $type  ) ){
+		do_action( 'frmplus_field_value_' . $type, compact( 'field', 'name', 'value', 'options', 'row_num', 'col_num', 'entry_id' ) );
 	}
 	else{
-		echo str_replace("\n","<br/>",$value);
+		if (is_array($value)){
+			echo implode(', ',$value);
+		}
+		elseif ($value == ''){
+			echo '&nbsp;';
+		}
+		else{
+			echo str_replace("\n","<br/>",$value);
+		}
 	}
 }
 else {
@@ -41,13 +51,8 @@ else {
 	//		$name is the name of the row or column
 	//		$options are the options (not applicable for textare and text fields)
 	//		$precedence is a string, either 'row' or 'column'
-	list($type,$name,$options,$precedence) = FrmPlusFieldsHelper::parse_with_precedence((count($rows) ? $opt : null),$col_opt);
-	$options = apply_filters('frmplus_field_options',$options,$field,$name,$row_num,$col_num); // Give filters the option of filtering on row/col or name of option or combination
 	$this_field_id = "field_{$field['field_key']}_{$row_num}_{$col_num}";
 	$this_field_name = sprintf( '%s[%s]', $field_name, $row_num );
-	if ( !isset( $options['options'] ) ){
-		$options['options'] = array();
-	}
 	
 	switch($type){ 
 	case 'textarea':
