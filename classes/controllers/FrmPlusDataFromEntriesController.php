@@ -166,9 +166,9 @@ jQuery( function($){
 		
 		if ( 'taxonomy' === $options['source']['form'] ){
 			$terms = get_terms( $options['source']['field'], array( 'hide_empty' => false ) );
-			$values = array( '' );
+			$values = array( '' => '' );
 			foreach ( $terms as $term ){
-				$values[] = $term->name;
+				$values[ $term->term_id ] = $term->name;
 			}
 		}
 		else{
@@ -197,10 +197,10 @@ jQuery( function($){
 		        global $frm_vars;
 		        $frm_vars['chosen_loaded'] = true;
 			}
-			//if ( is_array( $value ) ) $value = reset( $value ); ?>
-			<select class="<?php echo ( $options['autocom'] ? 'frm_chzn' : '' ); ?>" <?php echo ( $options['multiselect'] ? 'multiple data-placeholder=" "' : '' ); ?> name="<?php echo "{$this_field_name}[$col_num]"; ?>" id="<?php echo $this_field_id; ?>">
-				<?php foreach ( $values as $v ) : if ( $options['multiselect'] && $v == '' ) continue; ?>
-				<option value="<?php echo esc_attr( $v ); ?>" <?php selected( $v, $value ); ?>><?php echo $v; ?></option>
+			?>
+			<select class="<?php echo ( $options['autocom'] ? 'frm_chzn' : '' ); ?>" <?php echo ( $options['multiselect'] ? 'multiple data-placeholder=" "' : '' ); ?> name="<?php echo "{$this_field_name}[$col_num]" . ( $options['multiselect'] ? '[]' : '' ); ?>" id="<?php echo $this_field_id; ?>">
+				<?php foreach ( $values as $k => $v ) : if ( $options['multiselect'] && $v == '' ) continue; ?>
+				<option value="<?php echo esc_attr( $k ); ?>" <?php selected( true, is_array( $value ) ? in_array( $k, $value ) : $k == $value ); ?>><?php echo $v; ?></option>
 				<?php endforeach; ?>
 			</select>
 		<?php

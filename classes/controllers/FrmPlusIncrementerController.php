@@ -35,7 +35,7 @@ class FrmPlusIncrementerController{
 
 		$number = ( $precedence == 'row' ? $col_num : $row_num ) + 1;
 		
-		echo "<input type=\"text\" readonly name=\"$this_field_name\" id=\"$this_field_id\" value=\"$number\" class=\"auto_width table-cell readonly incrementer\"/>";
+		echo "<input type=\"text\" readonly name=\"{$this_field_name}[$col_num]\" id=\"$this_field_id\" value=\"$number\" class=\"auto_width table-cell readonly incrementer\"/>";
 	}
 	
 	public function localize_script(){

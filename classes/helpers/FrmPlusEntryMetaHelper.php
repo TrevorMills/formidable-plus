@@ -386,7 +386,6 @@ class FrmPlusEntryMetaHelper{
 	}
 	
 	function massage_request($html, $field, $meta, $unmassage = false){
-		
 		static $saved_item_metas, $table_field_ids;
 		if (!isset($saved_item_metas)){
 			$saved_item_metas = array();

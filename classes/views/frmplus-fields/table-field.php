@@ -95,12 +95,12 @@ else {
 			$options['autocom'] = false;
 			$frm_chzn = '';
 		}
-		echo "<select id=\"$this_field_id\" $multiple name=\"{$this_field_name}[$col_num]\" class=\"table-cell $frm_chzn\">\n";
+		echo "<select id=\"$this_field_id\" $multiple name=\"{$this_field_name}[$col_num]" . ( $multiple ? '[]' : '' ) . "\" class=\"table-cell $frm_chzn\">\n";
 		if ( !$multiple ){
 			echo '<option value="" '.selected($value,'',false).'>&nbsp;</option>'."\n";
 		}
 		foreach ($options['options'] as $option){
-			echo '<option value="'.esc_attr($option).'" '.selected($value,$option,false).'>'.$option.'</option>'."\n";
+			echo '<option value="'.esc_attr($option).'" '.selected( true, is_array( $value ) ? in_array( $option, $value ) : $value == $option,false).'>'.$option.'</option>'."\n";
 		}
 		echo '</select>'."\n";
 		break;
