@@ -7,6 +7,8 @@ Stable tag: 1.2
 
 This plugin adds a new field type to the Formidable Pro plugin.  It allows you to add a table to your form.
 
+Please Note: Version 1.2 is a fairly major upgrade.  We **strongly** recommend backing up your database before upgrading. 
+
 == Description ==
 
 *Please note: See the FAQ for information on which most recent version of Formidable Pro is supported.*
