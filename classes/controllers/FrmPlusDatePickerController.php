@@ -157,7 +157,9 @@ jQuery(function($){
 			$clone.show();
 		})
 		.on( 'click', '.delete', function(){
+			var $form = $(this).parents( '.form-contents' );
 			$(this).parents( '.datepicker-option' ).remove();
+			$form.find( '.add-option' ).trigger( 'change' ); // saves the form back to the server
 		});
 });
 </script>

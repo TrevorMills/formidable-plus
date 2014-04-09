@@ -3,21 +3,17 @@ Contributors: topquarky
 Tags: formidable, forms, table, new field-type
 Requires at least: 2.5 ( Formidable Pro 1.07.04 or higher is required )
 Tested up to: 3.8
-Stable tag: 1.1.16
+Stable tag: 1.2
 
 This plugin adds a new field type to the Formidable Pro plugin.  It allows you to add a table to your form.
 
 == Description ==
 
-*Please note: Formidable Pro version 1.07.04 or higher is required for this version of Formidable Plus to work.  Please see the FAQ.*
+*Please note: See the FAQ for information on which most recent version of Formidable Pro is supported.*
 
-I'm a big fan of the [Stephanie Wells'](http://strategy11.com) [Formidable Pro](http://formidablepro.com) plugin.  On a recent project, the client needed to have a *table* field type for people entering financials vs. timeline.  This add-on to Formidable Pro is the result of that work.  
+Formidable Plus is an add-on to [Strategy 11's](http://strategy11.com) great [Formidable Pro](http://formidablepro.com) plugin.  It adds a *table* field type that allows you to request data in a tabular form.  You can fill a table with many different types of fields, from simple text inputs or checkboxes, to datepickers and calculation fields.  See the FAQ for all available field types.  
 
-It integrates into Formidable Pro via the latter's wealth of filters and actions.  You can have any number of rows and any number of columns.  If you create a table without any rows (only columns), then the person filling out the form has the opportunity to add more rows as needed.  
-
-Administrators can re-order, add & delete rows or columns and any existing data gets updated to retain integrity.  
-
-Using special column/row naming nomenclature, administrators can turn the input field from the default `text` to either `textarea`, `select`, `radio` or `checkbox`.  See the FAQ for more information 
+You can have any number of rows and any number of columns.  You can even create a dynamic table, which allows users to add in new rows.  
 
 == Installation ==
 
@@ -31,7 +27,28 @@ Using special column/row naming nomenclature, administrators can turn the input 
 
 Recent releases of Formidable Pro have caused headaches with Formidable Plus - breaking things in unexpected places.  Because of this, I am unable to continually test F+ against all previous versions of FPro.  I am only able to support the current version of Formidable Pro.  Odds are good that it will work in previous versions, but I need to focus my development time on the current version.
 
-*Current version of Formidable Pro supported: 1.07.04.*
+*Current version of Formidable Pro supported: 1.07.06.*
+
+= What kinds of fields can I include in a Formidable Plus table? = 
+When you add a table field to your form, the edit widget gives you a dropdown box for each row and column.  The dropdown box contains the available field types.  Currently, these are:
+
+* Text - a plain text input field
+* Textarea - a multiline text input field
+* Select - a dropdown or autocomplete field
+* Checkbox - a series of checkboxes (select zero or more)
+* Radio - a series of radio buttons (select only one)
+* Radioline - one radio button per cell (in the row or column)
+* Datepicker - a datepicker field using the jQuery DatePicker plugin
+* Calculation - give a sum, average or count of fields in the table
+* Data From Entries - create select, checkbox or radio field based on values entered in another form, or from a WordPress taxonomy
+* Incrementer - a readonly incrementing number
+
+= I'm a developer; is there a way for me to add my own field type? =
+Yes.  See the controller files for Calculations, DataFromEntries, DatePicker and Incrementer in the `formidable-plus/classes/controllers/` directory for examples on how to do this.  
+
+= Can I create a table where the person filling out the form can add rows dynamically =
+
+Yes.  To do this, simply create a table field and don't add any rows.  (Add and name as many columns as you'd like).  When that table gets rendered in the form, there will be options to add new rows
 
 = When I export data, the table fields look weird =
 
@@ -75,26 +92,6 @@ There's a big catch with exporting the table data as CSV.  The data that gets ex
 
 This is a new feature, and I welcome your feedback on it.  
 
-= Can I create a table where the person filling out the form can add rows dynamically =
-
-Yes.  To do this, simply create a table field and don't add any rows.  (Add and name as many columns as you'd like).  When that table gets rendered in the form, there will be options to add new rows
-
-= How do I make the input field into a textarea for multiline input? =
-
-If you give your column (or row) name a prefix of `textarea:` (i.e. `textarea:My Column Name`), then all cells in that column (or row) will be rendered as `<textarea>`, allowing multiiline input.
-
-= How about Radio Buttons, Checkboxes and Dropdowns? =
-
-As of Formidable Plus 1.1.0, you now have several options for input type within your table.  To use this feature, you will follow the example from the textarea above and prefix your column or row name with a field type.  Here are the available types:
-
-* `textarea:{name}` - for multiline input (e.g. `textarea:My Row Name`)
-* `checkbox:{name}` - for a checkbox with a checked value of `on` (e.g. `checkbox:My Row Name`)
-* `checkbox:{name}:{value}` - for a checkbox with a checked value of `value` (e.g. `checkbox:My Row Name:Yes`)
-* `checkbox:{name}:{value1|value2|value3|...}` - for a set of multiple checkboxes, each with a the corresponding checked value.  You can put as many options as you'd like, separating each by the `|` character (e.g. `checkbox:Fruits You Like:Apples|Oranges|Bananas`)
-* `select:{name}:{value1|value2|value3|...}` - for a dropdown box. You can add as many options as you'd like to a dropdown box, separating each by the `|` character (e.g. `select:Choose a Fruit:Apples|Oranges|Bananas`)
-* `radio:{name}:{value1|value2|value3|...}` - for a group of radio buttons within the table cell (e.g. `radio:My Favourite Car:Honda|Ford|Lincoln|Mazda`)
-* `radioline:{name} - this will create a group of radio buttons across the entire row (or column), one button per cell that allows the user to choose an entire column (or row) (e.g. `radioline:Choose A Column`) 
-
 = Can I dynamically fill the options for field types that allow them (select, radio, checkbox) = 
 This is an advanced question and requires you to write an additional plugin and call a filter, but the short answer is yes, you can.  
 
@@ -113,35 +110,13 @@ If you're comfortable writing plugins, you'll want to `add_filter('frmplus_field
 	return $options;
 }`
 
-= I inserted a table field into a custom display and all that shows up is "Array,Array" = 
-
-This issue is resolved with Formidable Pro 1.05.04 and Formidable Plus 1.0.4.  Please upgrade.  
-
 = Can I enable arrow-key navigation through a table? =
 
-It's possible to enable users to use the arrow keys to navigate through a table.  This can be useful for large tables.  To do this, you need to add the class `use-arrow-keys` to your table.  To do that, edit your form in Formidable.  Find the Table field you want to affect and add `use-arrow-keys` to the CSS Layout Classes for the field.  Alternatively, you can do it in PHP (though this is no longer the recommended way):
-
-`add_filter('frm_table_classes','my_table_classes',10,2);
-function my_table_classes($classes,$field_id){
-	$my_field_id = 12; // the field_id of your table field
-	if ($field_id == $my_field_id){
-		$classes[] = 'use-arrow-keys';
-	}
-	return $classes;
-}`
+It's possible to enable users to use the arrow keys to navigate through a table.  This can be useful for large tables.  To do this, you need to add the class `use-arrow-keys` to your table.  You can add that to the CSS layout classes field under Field Options.
 
 = I have a big table and the user loses the column/row headings when navigating around it =
 
-It's possible to enable a tooltip which pops up the row/column name when the user focusses on a table cell.  This can be useful for large tables.  To do this, you need to add the class `use-tooltips` to your table.  To do that, edit your form in Formidable.  Find the Table field you want to affect and add `use-tooltips` to the CSS Layout Classes for the field.  Alternatively, you can do it in PHP (though this is no longer the recommended way):
-
-`add_filter('frm_table_classes','my_table_classes',10,2);
-function my_table_classes($classes,$field_id){
-	$my_field_id = 12; // the field_id of your table field
-	if ($field_id == $my_field_id){
-		$classes[] = 'use-tooltips';
-	}
-	return $classes;
-}`
+It's possible to enable a tooltip which pops up the row/column name when the user focusses on a table cell.  This can be useful for large tables.  To do this, you need to add the class `use-tooltips` to your table.  You can add that to the CSS layout classes field under Field Options.
 
 = People have made entries and I want to reorder/rename some of my rows/columns = 
  
@@ -149,13 +124,20 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 
 == Screenshots ==
 
-1. The admin view of a simple menu planning table
-2. What the menu planner looks like to the end-user
-3. The same form, but with all rows removed, and a new column to allow the end user to specify which meal.  They can add/delete rows
-4. Examples with different field types within the table
+1. The admin view of a a simple table with calculations and a datepicker
+2. What the user sees for the calculations table when they are filling out the form
+3. Examples with different field types within the table
+4. What the field looks like in a display or email context
 
 
 == Changelog ==
+
+= 1.2 = 
+* Major Change: changed the UI for creating different field types within the table.  Now, instead of having to write things like `checkbox:Title:apples|oranges|bananas`, you use a simple dropdown to choose the field type and a settings button to set the different options
+* New Field Types: Formidable Plus now ships with 10 built in field types, including Calculation, Datepicker and Data from Entries - common requests amongst Formidable Plus users
+* Feature: Select fields can now be marked as multiselect, which allows users to choose more than one value from the list
+* Feature: Select fields can now be marked as autocomplete, which changes the field in the table to be one where users can type and be presented with a list of available options
+* Fix: removed more lingering non-fatal PHP notices
 
 = 1.1.16 = 
 * Fix: dealt with lingering non-fatal PHP notices

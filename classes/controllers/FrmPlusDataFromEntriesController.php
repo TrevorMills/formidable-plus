@@ -229,13 +229,13 @@ jQuery( function($){
 			break;
 		case 'checkbox': ?>
 				<?php foreach ( $values as $option_num => $v ) : if ( $v == '' ) continue; ?>
-					<label><input type="checkbox" name="<?php echo "{$this_field_name}[$col_num][]"; ?>" value="<?php echo esc_attr( $v ); ?>" class="checkbox table-cell id-has-option" id="<?php echo "{$this_field_id}_{$option_num}"; ?>" <?php checked( true, $v == $value || ( is_array( $value ) && in_array( $v, $value ) ) ); ?>><?php echo $v; ?></label>
+					<label><input type="checkbox" name="<?php echo "{$this_field_name}[$col_num][]"; ?>" value="<?php echo esc_attr( $option_num ); ?>" class="checkbox table-cell id-has-option" id="<?php echo "{$this_field_id}_{$option_num}"; ?>" <?php checked( true, $option_num == $value || ( is_array( $value ) && in_array( $option_num, $value ) ) ); ?>> <?php echo $v; ?></label>
 				<?php endforeach; ?>
 		<?php
 			break;
 		case 'radio': ?>
 				<?php foreach ( $values as $option_num => $v ) : if ( $v == '' ) continue; ?>
-					<label><input type="radio" name="<?php echo "{$this_field_name}[$col_num]"; ?>" value="<?php echo esc_attr( $v ); ?>" class="radio table-cell id-has-option" id="<?php echo "{$this_field_id}_{$option_num}"; ?>" <?php checked( true, $v == $value || ( is_array( $value ) && in_array( $v, $value ) ) ); ?>><?php echo $v; ?></label>
+					<label><input type="radio" name="<?php echo "{$this_field_name}[$col_num]"; ?>" value="<?php echo esc_attr( $option_num ); ?>" class="radio table-cell id-has-option" id="<?php echo "{$this_field_id}_{$option_num}"; ?>" <?php checked( true, $option_num == $value || ( is_array( $value ) && in_array( $option_num, $value ) ) ); ?>> <?php echo $v; ?></label>
 				<?php endforeach; ?>
 		<?php
 			break;

@@ -71,3 +71,6 @@
 	border:none;
 	color:inherit !important;
 }
+.with_frm_style .frm-table label{
+	display:block;
+}

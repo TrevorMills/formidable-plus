@@ -61,7 +61,7 @@ else {
 	case 'radio':
 		if (count($options['options'])){
 			foreach($options['options'] as $option_num => $option){
-				echo '<input type="radio" class="radio table-cell id-has-option" id="'.$this_field_id.'_'.$option_num.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr($option).'" '.checked($value,$option,false).' /><label for="'.$this_field_id.'_'.$option_num.'">'.$option.'</label>'."\n";
+				echo '<label for="'.$this_field_id.'_'.$option_num.'"><input type="radio" class="radio table-cell id-has-option" id="'.$this_field_id.'_'.$option_num.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr($option).'" '.checked($value,$option,false).' /> '.$option.'</label>'."\n";
 			}
 		}
 		else{
@@ -112,7 +112,7 @@ else {
 	case 'checkbox':
 		if (count($options['options'])){
 			foreach ($options['options'] as $option_num => $option){
-				echo '<input type="checkbox" id="'.$this_field_id.'_'.$option_num.'" name="'.$this_field_name.'['.$col_num.'][]" class="checkbox table-cell id-has-option" value="'.esc_attr($option).'" '.checked(in_array($option,(array)$value),true,false).' /><label for="'.$this_field_id.'_'.$option_num.'">'.$option.'</label>'."\n";
+				echo '<label for="'.$this_field_id.'_'.$option_num.'"><input type="checkbox" id="'.$this_field_id.'_'.$option_num.'" name="'.$this_field_name.'['.$col_num.'][]" class="checkbox table-cell id-has-option" value="'.esc_attr($option).'" '.checked(in_array($option,(array)$value),true,false).' /> '.$option.'</label>'."\n";
 			}
 		}
 		else{
