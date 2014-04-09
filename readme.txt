@@ -45,6 +45,12 @@ When you add a table field to your form, the edit widget gives you a dropdown bo
 * Data From Entries - create select, checkbox or radio field based on values entered in another form, or from a WordPress taxonomy
 * Incrementer - a readonly incrementing number
 
+= I tried to upgrade and received a message The package could not be installed. PCLZIP_ERR_BAD_FORMAT (-10) : Unable to find End of Central Dir Record signature = 
+It’s most likely that the Top Quark credentials are not entered properly on the Settings > Formidable Plus page.  Go there, enter the credentials you received when you purchased the plugin, get the "Awesome! You're good to go!" message, and then visit your plugins page. Add `?forceCheck=true` to the end of the plugins.php url.  Then, you should be able to run the update properly.
+
+= I see there's an update, but it says my subscription has run out.  What's up? = 
+It’s most likely that the Top Quark credentials are not entered properly on the Settings > Formidable Plus page.  Go there, enter the credentials you received when you purchased the plugin, get the "Awesome! You're good to go!" message, and then visit your plugins page. Add `?forceCheck=true` to the end of the plugins.php url.  Then, you should be able to run the update properly.
+
 = I'm a developer; is there a way for me to add my own field type? =
 Yes.  See the controller files for Calculations, DataFromEntries, DatePicker and Incrementer in the `formidable-plus/classes/controllers/` directory for examples on how to do this.  
 
