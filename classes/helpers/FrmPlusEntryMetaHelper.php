@@ -204,7 +204,8 @@ class FrmPlusEntryMetaHelper{
 					$row_opt = null;
 				}
 				for ($index = 0; $index < count($columns); $index++){
-					list($type,$name,$options,$precedence) = FrmPlusFieldsHelper::parse_with_precedence($row_opt,$columns[ array_keys( $columns )[$index] ]);
+					$column_keys = array_keys( $columns );
+					list($type,$name,$options,$precedence) = FrmPlusFieldsHelper::parse_with_precedence($row_opt,$columns[ $column_keys[$index] ]);
 					
 					if (!isset($row_data[$index])){
 						$tmp[$tmp_index] = '';
