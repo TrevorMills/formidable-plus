@@ -58,25 +58,23 @@ Version 1.1.10 of Formidable Plus finally addressed the issue of exporting data.
 
 Presenting a table's worth of data in a single spreadsheet cell is actually quite an interesting problem.  Formidable Plus solves it by outputting a *plain text* formatted version of the table. However, when you open up the exported CSV into Excel (or similar), it will only look good if you use a **fixed-width** font for that column.  You'll have to figure out how to change the font in your program.  Once you have a fixed width font, you can widen the column until the table data appears, looking something like:
 
-`
-                 | Column 2        | Column 1        |
-------------------------------------------------------
- Row 4           | Yes             | No              |
-------------------------------------------------------
- Radio Row       | on              |                 |
-------------------------------------------------------
- Row 1           | I selected colu-| This is column -|
-                 | mn 2            | 1               |
-------------------------------------------------------
- Row 3           | Bananas         | Peaches         |
-------------------------------------------------------
- Row 5           | Two, Three      | One, Four       |
-------------------------------------------------------
- One Option      | Yes             |                 |
-------------------------------------------------------
- Row 2           |                 | Checked Value   |
-------------------------------------------------------
-`
+                     | Column 2        | Column 1        |
+    ------------------------------------------------------
+     Row 4           | Yes             | No              |
+    ------------------------------------------------------
+     Radio Row       | on              |                 |
+    ------------------------------------------------------
+     Row 1           | I selected colu-| This is column -|
+                     | mn 2            | 1               |
+    ------------------------------------------------------
+     Row 3           | Bananas         | Peaches         |
+    ------------------------------------------------------
+     Row 5           | Two, Three      | One, Four       |
+    ------------------------------------------------------
+     One Option      | Yes             |                 |
+    ------------------------------------------------------
+     Row 2           |                 | Checked Value   |
+    ------------------------------------------------------
 
 By default, the width of each column is 15 characters.  You can change this by using the filter `frmplus_csv_export_fixed_width` in the FrmPlusEntryMetaHelper class (see that file for reference).  
 
