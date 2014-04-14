@@ -222,7 +222,23 @@ jQuery( function($){
 		
 		count: function( inputs ){
 			return inputs.length;
+		},
+		
+		product: function( inputs ){
+			var product = false, error = false;
+			inputs.each( function(){
+				var value = me.parseNum( $(this).val() );
+				if ( value === false )
+					error = true;
+				else if ( product === false )
+					product = value;
+				else
+					product = product * value;
+			
+			});
+			return error ? me.__.error : product;
 		}
+		
 	});
 	
 	me.init();

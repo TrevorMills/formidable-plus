@@ -5,6 +5,7 @@ class FrmPlusCalculationsController{
 		'sum',
 		'average',
 		'count',
+		'product',
 	);
 	
 	var $enqueued = false;
