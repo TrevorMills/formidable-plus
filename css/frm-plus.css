@@ -63,7 +63,9 @@
 .with_frm_style .frm-table input.readonly,
 .frm-table input.readonly,
 .with_frm_style .frm-table input.calculation:focus,
-.with_frm_style .frm-table input.readonly:focus
+.with_frm_style .frm-table input.readonly:focus,
+.with_frm_style input[readonly].calculation,
+.with_frm_style input[readonly].calculation:focus
 {
 	background:transparent;
 	opacity: 1;

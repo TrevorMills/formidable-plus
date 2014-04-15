@@ -47,14 +47,23 @@ jQuery( function($){
 							if ( typeof me.calculators[ field_id ][ selector ] == 'undefined' ){
 								me.calculators[ field_id ][ selector ] = {};
 							}
+							settings.rows.push( selector );
 							me.calculators[ field_id ][ selector ][ key ] = settings;
+						});
+						$( table_selector ).on( 'delete_row', function ( e, field_id ){
+							var last; // need to remove the last row out of the me.calculators[ field_id ] object
+							$.each( me.calculators[ field_id ], function ( key ){
+								last = key;
+							});
+							delete me.calculators[ field_id ][ last ];
+							me.calculateOthers( table_selector ); // if there are other fields calculated with values from this table, this will update those calculations
 						});
 					}			
 				});
 				
 				// Refactor Calculators - if we have multiple calculation lines in a single table, no need to add listeners
 				// for each one.  Make a single listener and perform all calculations there
-				var selectors = [];
+				var selectors = [], others = {};
 				me.calculators[ field_id ] = {};
 				me.special_calculators[ field_id ] = [];
 				$.each( fields, function( key, settings ){
@@ -63,6 +72,10 @@ jQuery( function($){
 							me.calculators[ field_id ][ selector ] = {};
 						}
 						me.calculators[ field_id ][ selector ][ key ] = settings;
+						if ( typeof settings.other != 'undefined' ){
+							others[ key ] = settings;
+							$( me.getOtherSelector( settings.other.id ) ).prop( 'readonly', true ).addClass( 'calculation' );
+						}
 						if ( selectors.indexOf( selector ) == -1 ){
 							selectors.push( '.' + selector );
 						}
@@ -73,6 +86,9 @@ jQuery( function($){
 						}
 					});
 				});
+				if ( !$.isEmptyObject( others ) ){
+					$( table_selector ).data( 'others', others );
+				}
 				
 				$( table_selector ).on( me.keyup_event, selectors.join( ',' ), { field_id: field_id }, me.keyupListener);
 			});
@@ -80,6 +96,10 @@ jQuery( function($){
 		
 		getTableSelector: function( field_id ){
 			return '#frm-table-' + field_id + ' ';
+		},
+		
+		getOtherSelector: function( id ){
+			return 'form :input[name="item_meta[' + id + ']"]';
 		},
 		
 		getOpposite: function( key ){ 
@@ -160,6 +180,37 @@ jQuery( function($){
 					$( target ).val( $( target ).data( 'result-row' ) + ' ' + me.__.column_indicator + ' ' + $( target ).data( 'result-column' ) + ' ' + me.__.row_indicator );
 				}
 			});
+			
+			me.calculateOthers( table_selector );
+		},
+		
+		calculateOthers: function ( table_selector ){
+			$.each( $( table_selector ).data( 'others' ) || {}, function( key, settings ){
+				var other_target = me.getOtherSelector( settings.other.id ),
+					inputs;
+				if ( key.substr( 0, 3 ) == 'row' ){
+					inputs = $( table_selector + '.' + key + ' td :input' );
+				}
+				else{
+					inputs = $( table_selector + 'tr td.' + key + ' :input' );
+				}
+				
+				$( other_target ).val(
+					me.toFixed( 
+						// this next line may look a little confusing, but it's just a compact way of calling a function
+						// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
+						// the value of settings.include_empty )
+						me[ settings.other.function ]( inputs.filter( function(){
+							if ( !settings.include_empty && $(this).val() == '' ){
+								// easy
+								return false;
+							}
+							// trickier.  This is saying to return true if this input has a parent that matches the selectors given by getOpposite
+							return $(this).parentsUntil( 'table', '.' + settings[ me.getOpposite( key ) + 's' ].join( ', .' ) ).length > 0;
+						}))
+					, settings )
+				);
+			});
 		},
 		
 		toFixed: function( number, settings ){
@@ -222,7 +273,23 @@ jQuery( function($){
 		
 		count: function( inputs ){
 			return inputs.length;
+		},
+		
+		product: function( inputs ){
+			var product = false, error = false;
+			inputs.each( function(){
+				var value = me.parseNum( $(this).val() );
+				if ( value === false )
+					error = true;
+				else if ( product === false )
+					product = value;
+				else
+					product = product * value;
+			
+			});
+			return error ? me.__.error : product;
 		}
+		
 	});
 	
 	me.init();
