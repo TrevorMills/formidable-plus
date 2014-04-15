@@ -2,8 +2,8 @@
 **Contributors:** topquarky  
 **Tags:** formidable, forms, table, new field-type  
 **Requires at least:** 2.5 ( Formidable Pro 1.07.04 or higher is required )  
-**Tested up to:** 3.8  
-**Stable tag:** 1.2  
+**Tested up to:** 3.8.2  
+**Stable tag:** 1.2.1
 
 This plugin adds a new field type to the Formidable Pro plugin.  It allows you to add a table to your form.
 
@@ -139,6 +139,12 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 
 
 ## Changelog ##
+
+### 1.2.1 ###
+* Feature: Calculation fields can now place calculations into other fields on the form
+* New: Calculation fields can now calculate the product (multiplication) of cells 
+* New: The Incrementer field can have different styles (1 2 3 or A B C or I II III)
+* New: The Incrementer field can start at any number and can have a suffix
 
 ### 1.2 ###
 * Major Change: changed the UI for creating different field types within the table.  Now, instead of having to write things like `checkbox:Title:apples|oranges|bananas`, you use a simple dropdown to choose the field type and a settings button to set the different options
