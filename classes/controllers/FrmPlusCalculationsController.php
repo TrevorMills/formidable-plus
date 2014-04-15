@@ -12,6 +12,7 @@ class FrmPlusCalculationsController{
 
 	public function __construct(){
 		add_action( 'frmplus_register_types', array( &$this, 'register_type' ) );
+		$this->available_calculations = apply_filters( 'frmplus_available_calculations', $this->available_calculations );
 	}
 	
 	function register_type(){
@@ -54,6 +55,16 @@ class FrmPlusCalculationsController{
 				$options[ "all_$what" ] = $options[ "all_$what" ] == 'yes';
 			}
 		}
+		if ( !isset( $options['other'] ) || empty( $options['other']['active'] ) || empty( $options['other']['id'] )){
+			$options['other'] = array( 
+				'active' => false,
+				'function' => null,
+				'id' => null
+			);
+		}
+		else{
+			$options['other']['active'] = $options['other']['active'] == 'yes';
+		}
 		return $options;
 	}
 	
@@ -69,7 +80,7 @@ class FrmPlusCalculationsController{
 		<div class="section">
 			<label><?php _e( 'Function', FRMPLUS_PLUGIN_NAME ); ?>:</label>
 			<select name="frmplus_options[function]">
-				<?php foreach ( apply_filters( 'frmplus_available_calculations', $this->available_calculations ) as $option ) : ?>
+				<?php foreach ( $this->available_calculations as $option ) : ?>
 					<option value="<?php echo $option; ?>" <?php selected( $option, $options['function'] ); ?>><?php echo __( ucwords( $option ), FRMPLUS_PLUGIN_NAME ); ?></option>
 				<?php endforeach; ?>
 			</select>
@@ -110,6 +121,25 @@ class FrmPlusCalculationsController{
 				</div>
 			</div>
 		<?php endforeach; ?>
+		<div class="section">
+			<label><input type="checkbox" name="frmplus_options[other][active]" value="yes" <?php checked( true, $options[ 'other' ]['active'] ); ?>> <?php _e( 'Place the', FRMPLUS_PLUGIN_NAME ); ?></label>
+			<select name="frmplus_options[other][function]">
+				<?php foreach ( $this->available_calculations as $option ) : ?>
+					<option value="<?php echo $option; ?>" <?php selected( $option, $options['other']['function'] ); ?>><?php echo __( ucwords( $option ), FRMPLUS_PLUGIN_NAME ); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<?php _e( 'of these fields into this field: ', FRMPLUS_PLUGIN_NAME ); ?>
+			<?php 
+				global $frm_field, $wpdb;
+				$fields = $frm_field->getAll( $wpdb->prepare( 'fi.form_id = %d AND fi.type IN ( "text", "number", "hidden" )', $field->form_id ), 'field_order');
+			?>
+			<select name="frmplus_options[other][id]">
+				<option value="">--<?php _e( 'Choose a field', FRMPLUS_PLUGIN_NAME ); ?>--</option>
+				<?php foreach ( $fields as $f ) : ?>
+					<option value="<?php echo $f->id; ?>" <?php selected( $f->id, $options['other']['id'] ); ?>><?php echo $f->name; ?>
+				<?php endforeach; ?>
+			</select>
+		</div>
 	</div>
 </div>
 		<?php
@@ -171,6 +201,9 @@ class FrmPlusCalculationsController{
 				}
 				if ( !isset( $settings[ 'function' ] ) ){
 					$settings[ 'function' ] = 'sum';
+				}
+				if ( !$settings['other']['active'] ){
+					unset( $settings['other'] );
 				}
 				if ( count( $rows ) == 0 ){
 					$settings[ 'rows' ] = 'tr';
