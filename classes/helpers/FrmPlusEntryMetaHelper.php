@@ -31,6 +31,8 @@ class FrmPlusEntryMetaHelper{
 			$field->options = maybe_unserialize($field->options);
 			$field = (array) $field;
 			$field['value'] = $value;
+			
+			$field = FrmPlusFieldsHelper::adjust_for_attributes( $field, $atts ); 
 			ob_start();
 			require(FRMPLUS_VIEWS_PATH.'/frmplus-fields/table.php');
 			$value = ob_get_clean();

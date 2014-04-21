@@ -334,7 +334,7 @@ class FrmPlusFieldsController{
 					}
 				}
 				else{
-					foreach ($data as $row){
+					foreach ($data as $row_index => $row){
 						$new_row_data = array();
 						foreach ($map as $old_loc){
 							if (array_key_exists($old_loc,$row)){
@@ -344,7 +344,7 @@ class FrmPlusFieldsController{
 								$new_row_data[] = '';
 							}
 						}
-						$new_data[] = $new_row_data;
+						$new_data[ $row_index ] = $new_row_data;
 					}
 				}
 		      	$query_results = $wpdb->update( $frmdb->entry_metas, array('meta_value' => serialize($new_data)), array( 'id' => $meta->id ) );

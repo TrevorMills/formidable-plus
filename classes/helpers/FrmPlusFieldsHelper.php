@@ -266,7 +266,7 @@ class FrmPlusFieldsHelper{
 	
 	function frmplus_replace_shortcodes($replace_with,$tag,$atts,$field){
 		if ($field and $field->type == 'table'){
-			$replace_with = FrmPlusEntryMetaHelper::frmplus_display_value_custom($replace_with,$field,array());
+			$replace_with = FrmPlusEntryMetaHelper::frmplus_display_value_custom($replace_with,$field,$atts);
 		}
 		return $replace_with;
 	}
@@ -534,6 +534,111 @@ class FrmPlusFieldsHelper{
 			$value['value'] = FrmPlusEntryMetaHelper::fetch( $field->id, $entry_id );
 		}
 		return $value;
+	}
+	
+	/**
+	 * When displaying a table field value, they can include attributes include_columns, include_rows, exclude_columns or exclude_rows
+	 * to determine which columns/rows to include/exclude.  This is the function that adjusts the $field['options'] and $field['value']
+	 * based on those.  If include_xxx is set, then only those xxx's will be included.  If exclude_xxx is set, then all xxx's except
+	 * those will be included.  if both include_xxx and exclude_xxx are set, then we will only pay attention to include_xxx.  
+	 * The attribute value is a comma separated list of column/row headings ( i.e. Column 1, Subtotal ), keys ( i.e. row_1, row_2 ) or
+	 * numbers ( i.e. 0, 3 ).  We'll handle all of those cases
+	 * 
+	 * NOTE: Only call this function in a "display_only" context.  If you call it when the form is being rendered for filling in
+	 * then it will cause data discrepencies.  
+	 */ 
+	public static function adjust_for_attributes( $field, $atts ){
+		// Get the columns and rows.  They are associative arrays with the keys being, for example, col_1, col_2, etc.
+		list( $columns, $rows ) = self::get_table_options( $field['options'] );
+		
+		foreach ( array( 'rows', 'columns' ) as $what ){
+			// Include takes priority over exclude, if both set
+			if ( isset( $atts[ "include_$what" ] ) && isset( $atts[ "exclude_$what" ] ) ){
+				unset( $atts[ "exclude_$what" ] );
+			}
+
+			if ( isset( $atts[ "include_$what" ] ) ){
+				// include those mentioned, exclude nothing
+				$include = array_map( 'trim', explode( ',', $atts[ "include_$what" ] ) );
+				$exclude = array();
+			}
+			else{
+				// include all, exclude thos mentioned
+				$include = array_keys( $$what );
+				$exclude = array_map( 'trim', explode( ',', $atts[ "exclude_$what" ] ) );
+			}
+			
+			foreach ( array( 'include', 'exclude' ) as $clude ){
+				$new_clude = array();
+				// Here's where we canonicalize headings, keys or numbers into straight numbers
+				foreach ( $$clude as $item ){
+					if ( is_numeric( $item ) ){
+						if ( $item < count( $$what ) ){
+							$new_clude[] = $item;
+						}
+					}
+					elseif ( preg_match( '/^' . substr( $what, 0, 3 ) . '_[0-9]+$/', $item ) ){
+						// It's a key
+						$index = array_search( $item, array_keys( $$what ) );
+						if ( $index !== false ){
+							$new_clude[] = $index;
+						}
+					}
+					else{
+						// It's a heading
+						foreach ( $$what as $key => $line ){
+							if ( (!is_array( $line ) && $item == $line) || ( is_array( $line ) && $item == $line['name'] ) ){
+								$new_clude[] = array_search( $key, array_keys( $$what ) );
+							}
+						}
+					}
+				}
+				$$clude = $new_clude;
+			}
+			
+			$include = array_diff( $include, $exclude );
+			
+			foreach ( array_keys( $$what ) as $index => $x ){
+				if ( !in_array( $index, $include ) ){
+					unset( $field['options'][ $x ] );
+				}
+			}
+			if ( !empty( $field['value'] ) ){
+				if ( $what == 'columns' ){
+					foreach ( $field['value'] as $row_index => $column_cells ){
+						foreach ( $column_cells as $col_index => $cell_value ){
+							if ( !in_array( $col_index, $include ) ){
+								unset( $field['value'][$row_index][$col_index] );
+							}
+						}
+						// reindex the column cells 
+						// this is the line that will really screw things up if not in a display_only context
+						$field['value'][$row_index] = array_values( $field['value'][$row_index] );
+					}
+				}
+				elseif ( !empty( $include ) ){
+					// First off, need to make sure there is a value for every row
+					// otherwise, array_values below will cause this algorithm to drop rows
+					foreach ( array_keys( $rows ) as $row_index => $key ){
+						if ( !isset( $field['value'][$row_index] ) ){
+							$field['value'][$row_index] = false;
+						}
+					}
+					ksort( $field['value'] );
+					foreach ( $field['value'] as $row_index => $column ){
+						if ( !in_array( $row_index, $include ) ){
+							unset( $field['value'][$row_index] );
+						}
+					}
+					// array_values reorders the indices based on which rows are to be included
+					// array_filter removes any that we set to value above.  
+					$field['value'] = array_filter( array_values( $field['value'] ) );
+				}
+			}
+
+		}
+			
+		return $field;
 	}
 
 }
