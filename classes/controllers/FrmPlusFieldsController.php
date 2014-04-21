@@ -152,8 +152,8 @@ class FrmPlusFieldsController{
 					if ($t == 'row'){
 						unset($data[$target]);
 						$new_data = array();
-						foreach ($data as $d){
-							$new_data[] = $d;
+						foreach ($data as $row_index => $d){
+							$new_data[$row_index-1] = $d; // the -1 is to account for the row we've just deleted
 						}
 						$data = $new_data;
 					}
@@ -329,9 +329,10 @@ class FrmPlusFieldsController{
 						}
 						else{
 							// Need to spoof it.
-							$new_data[] = array_fill(0,count($columns),'');
+							$new_data[] = false; 
 						}
 					}
+					$new_data = array_filter( $new_data ); // get rid of the ones we set to false above
 				}
 				else{
 					foreach ($data as $row_index => $row){
