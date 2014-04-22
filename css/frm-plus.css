@@ -62,8 +62,15 @@
 .frm-table input.calculation,
 .with_frm_style .frm-table input.readonly,
 .frm-table input.readonly,
+.with_frm_style .frm-table textarea.readonly,
+.frm-table textarea.readonly,
+.with_frm_style .readonly input[readonly],
+.with_frm_style .readonly input[readonly]:focus,
+.with_frm_style .readonly textarea[readonly],
+.with_frm_style .readonly textarea[readonly]:focus,
 .with_frm_style .frm-table input.calculation:focus,
 .with_frm_style .frm-table input.readonly:focus,
+.with_frm_style .frm-table textarea.readonly:focus,
 .with_frm_style input[readonly].calculation,
 .with_frm_style input[readonly].calculation:focus
 {
@@ -72,6 +79,12 @@
 	filter: alpha(opacity=100);
 	border:none;
 	color:inherit !important;
+}
+.with_frm_style .frm-table textarea.readonly,
+.frm-table textarea.readonly{
+	overflow:scroll;
+	resize:none;
+	width:100%;
 }
 .with_frm_style .frm-table label{
 	display:block;

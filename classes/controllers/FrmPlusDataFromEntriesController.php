@@ -105,7 +105,7 @@ class FrmPlusDataFromEntriesController{
 			<label><input type="checkbox" name="frmplus_options[multiselect]" value="on" <?php checked( true, $options['multiselect'] ); ?>><?php _e( 'enable multiselect', FRMPLUS_PLUGIN_NAME ); ?></label>
 			<label><input type="checkbox" name="frmplus_options[autocom]" value="on" <?php checked( true, $options['autocom'] ); ?>><?php _e( 'enable autocomplete', FRMPLUS_PLUGIN_NAME ); ?></label>
 		</div>
-		<div class="section">
+		<div class="section other" <?php if ( empty( $options['source']['form'] ) || empty( $options['source']['field'] ) ) : ?>style="display:none"<?php endif; ?>>
 			<label><input type="checkbox" name="frmplus_options[other][active]" value="yes" <?php checked( true, $options[ 'other' ]['active'] ); ?>> <?php _e( 'Place the corresponding value(s) from ', FRMPLUS_PLUGIN_NAME ); ?></label>
 			<span class="data-source-field" data-field-name="frmplus_options[other][field]">
 				<?php if ( !empty( $options['source']['form'] ) ){
@@ -125,7 +125,8 @@ class FrmPlusDataFromEntriesController{
 <script type="text/javascript">
 jQuery( function($){
 	$( '#<?php echo $id; ?>' ).on( 'change', '.select-form', function(){
-		$(this).next( '.data-source-field' ).empty();
+		$( '#<?php echo $id; ?> .data-source-field' ).empty();
+		$( '#<?php echo $id; ?> .other' ).hide().find( 'input[type="checkbox"]' ).removeAttr( 'checked' );
 		if ( $(this).val() != '' ){
 			$.post( ajaxurl, {
 				action: 'frmplus_get_field_selection',
@@ -138,6 +139,13 @@ jQuery( function($){
 					}
 				});
 			});
+		}
+	}).on( 'change', '.data-source-field select', function(){
+		if ( ['','taxonomy'].indexOf( $( '#<?php echo $id; ?> .select-form' ).val() ) == -1 && $(this).val() != '' ){
+			$( '#<?php echo $id; ?> .other' ).show();
+		}
+		else{
+			$( '#<?php echo $id; ?> .other' ).hide().find( 'input[type="checkbox"]' ).removeAttr( 'checked' );
 		}
 	});
 })
@@ -219,7 +227,8 @@ jQuery( function($){
 				);
 				global $frm_field;
 				$field = $frm_field->getOne( $options['source']['field'] );
-		
+				$field->field_options['data_type'] = 'select';	// Set this to ensure we always get a '' => '' value at the beginning
+				
 				if ( isset( $entry_id ) ){
 					$values = FrmProFieldsHelper::get_linked_options( $values, $field, $entry_id );
 				}
@@ -293,30 +302,16 @@ jQuery( function($){
 				$this->particulars[ $field['id'] ][ 'others' ] = array();
 			}
 			$this->particulars[ $field['id'] ]['others'][ $selector ] = array(
-				'map' => $this->get_other_values( $options['other']['field'], $values ),
+				'map' => $this->get_data_values( array( 
+					'source' => array(
+						'field' => $options['other']['field'],
+						'form' => $options['source']['form']
+					),
+					'restrict' => $options['restrict']
+				) ),
 				'target' => $precedence . '-' . array_search( $options['other']['cell'], array_keys( $precedence == 'row' ? $rows : $columns ) )
 			);
 		}
-	}
-	
-	public function get_other_values( $other_id, $values ){
-		global $frmdb, $wpdb;
-		$entry_ids = array_filter( array_keys( $values ) );
-		$query = $wpdb->prepare( "
-			SELECT 
-				m.item_id,
-				m.meta_value 
-			FROM $frmdb->entry_metas m 
-			WHERE m.field_id = %d 
-			  AND m.item_id IN ( " . implode( ',', array_fill( 0, count( $entry_ids ), '%d' ) ) . " )
-			", array_merge( array( $other_id ), $entry_ids ) );
-		
-		$results = $wpdb->get_results( $query );
-		$return = array();
-		foreach ( $results as $result ){
-			$return[ $result->item_id ] = $result->meta_value;
-		}
-		return $return;
 	}
 	
 	public function localize_script(){

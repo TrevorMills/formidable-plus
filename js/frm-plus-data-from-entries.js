@@ -17,20 +17,26 @@ jQuery( function($){
 								})
 							}
 							else if ( $(this).is( 'select' ) && $(this).prop( 'multiple') ){
-								values = $(this).val();
+								$.each( $(this).val(), function( index, value ){
+									values.push( options.map[ value ] );
+								});
 							}
 							else{
 								values.push( options.map[ $(this).val() ] );
 							}
 							
 							if ( options.target.match( /^row-[0-9]+$/ ) ){
-								var column = $(this).closest( 'td' ).attr( 'class' ).match( /column-[0-9]+/ )[0];
-								$( table_selector + '.' + options.target + ' .' + column  + ' input' ).val( values.join( ', ' ) );
+								var column = $(this).closest( 'td' ).attr( 'class' ).match( /column-[0-9]+/ )[0],
+									$input = $( table_selector + '.' + options.target + ' .' + column  + ' :input' );
 							}
 							else{
-								var row = $(this).closest( 'tr' ).attr( 'class' ).match( /row-[0-9]+/ )[0];
-								$( table_selector + '.' + row + ' .' + options.target  + ' input' ).val( values.join( ', ' ) );
+								var row = $(this).closest( 'tr' ).attr( 'class' ).match( /row-[0-9]+/ )[0],
+									$input = $( table_selector + '.' + row + ' .' + options.target  + ' :input' );
 							}
+							$input.val( values.join( ', ' ) );	
+							if ( $input.is( 'textarea' ) ){
+								$input.height(1).height( $input.get(0).scrollHeight );
+							}						
 						})
 					});
 				}
