@@ -65,6 +65,12 @@ class FrmPlusCalculationsController{
 		else{
 			$options['other']['active'] = $options['other']['active'] == 'yes';
 		}
+		if ( !isset( $options['prefix'] ) ){
+			$options['prefix'] = '';
+		}
+		if ( !isset( $options['suffix'] ) ){
+			$options['suffix'] = '';
+		}
 		return $options;
 	}
 	
@@ -96,6 +102,15 @@ class FrmPlusCalculationsController{
 				<input type="checkbox" name="frmplus_options[forced]" value="on" <?php checked( true, $options['forced'] ); ?>> <?php _e( 'forced', FRMPLUS_PLUGIN_NAME ); ?>
 				<span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php echo esc_attr( __( 'If forced, then this number of decimals will always show.  Otherwise, they only show when non-zero.', FRMPLUS_PLUGIN_NAME ) ); ?>"></span>
 			</label>
+		</div>
+		<div class="section">
+			<label><?php _e( 'Prefix', FRMPLUS_PLUGIN_NAME ); ?>: </label>
+			<span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php echo esc_attr( __( 'This string will be prepended to the calculation.  Examples might be $ (dollar sign) or other currency symbol.', FRMPLUS_PLUGIN_NAME ) ); ?>"></span>
+			<input type="text" name="frmplus_options[prefix]" value="<?php echo $options['prefix']; ?>" >
+			<br/>
+			<label><?php _e( 'Suffix', FRMPLUS_PLUGIN_NAME ); ?>: </label>
+			<span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php echo esc_attr( __( 'This string will be appended to the calculation.  Examples might be % (percent)', FRMPLUS_PLUGIN_NAME ) ); ?>"></span>
+			<input type="text" name="frmplus_options[suffix]" value="<?php echo $options['suffix']; ?>" >
 		</div>
 		<div class="section">
 			<?php _e( 'Include empty inputs in calculation?', FRMPLUS_PLUGIN_NAME ); ?>
@@ -171,7 +186,9 @@ class FrmPlusCalculationsController{
 				'__' => array(
 					'error' => __( 'Error', FRMPLUS_PLUGIN_NAME ),
 					'row_indicator' => '↔',
-					'column_indicator' => '↕'
+					'column_indicator' => '↕',
+					'decimal' => '.',
+					'thousands' => ','
 				)
 			))
 		);
@@ -207,6 +224,12 @@ class FrmPlusCalculationsController{
 				}
 				if ( count( $rows ) == 0 ){
 					$settings[ 'rows' ] = 'tr';
+				}
+				if ( empty( $settings['prefix'] ) ){
+					unset( $settings['prefix'] );
+				}
+				if ( empty( $settings['suffix'] ) ){
+					unset( $settings['suffix'] );
 				}
 				$particulars[ $field_id ][ $key ] = $settings;
 			}

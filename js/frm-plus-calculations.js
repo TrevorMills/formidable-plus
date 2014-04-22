@@ -20,6 +20,24 @@ jQuery( function($){
 		 * calculators that are the intersection of calculated rows and calculated columns
 		 */
 		special_calculators: {},
+
+		/** 
+		 * allowed prefixes for calculable fields
+		 */
+		prefixes: [ '$', '(' ],
+
+		/** 
+		 * allowed suffixes for calculable fields
+		 */
+		suffixes: [')', 'k', 'm' ],
+		
+		/** 
+		 * only create this these regexps once
+		 */
+		regexps: {
+			parseNum: false,
+			ignorableChars: false
+		},
 		
 		init: function(){
 			$.each( me.particulars, function( field_id, fields ){
@@ -58,7 +76,13 @@ jQuery( function($){
 							delete me.calculators[ field_id ][ last ];
 							me.calculateOthers( table_selector ); // if there are other fields calculated with values from this table, this will update those calculations
 						});
-					}			
+					}	
+					if ( typeof settings.prefix != 'undefined' && me.prefixes.indexOf( settings.prefix ) == -1 ){
+						me.prefixes.push( settings.prefix );
+					}
+					if ( typeof settings.suffix != 'undefined' && me.suffixes.indexOf( settings.suffix ) == -1 ){
+						me.suffixes.push( settings.suffix );
+					}
 				});
 				
 				// Refactor Calculators - if we have multiple calculation lines in a single table, no need to add listeners
@@ -213,6 +237,24 @@ jQuery( function($){
 			});
 		},
 		
+		// Thanks http://stackoverflow.com/questions/2593637/how-to-escape-regular-expression-in-javascript
+		quote: function(str) {
+			return (str+'').replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
+		},
+		
+		// Thanks http://stackoverflow.com/questions/3753483/javascript-thousand-separator-string-format
+		addThousandsSeparator: function(nStr) {
+		    nStr += '';
+		    x = nStr.split('.');
+		    x1 = x[0];
+		    x2 = x.length > 1 ? '.' + x[1] : '';
+		    var rgx = /(\d+)(\d{3})/;
+		    while (rgx.test(x1)) {
+		            x1 = x1.replace(rgx, '$1' + me.__.thousands + '$2');
+		    }
+		    return x1 + x2;
+		},
+		
 		toFixed: function( number, settings ){
 			if ( typeof number == 'string' ){
 				return number;
@@ -226,18 +268,59 @@ jQuery( function($){
 					number = number.replace( /0+$/, '' ); // strip off trailing 0's
 					number = number.replace( /\.$/, '' ); // if there are no decimal points to display, strip the decimal
 				}
+				if ( typeof settings.prefix != 'undefined' ){
+					number = settings.prefix + number;
+				}
+				if ( typeof settings.suffix != 'undefined' ){
+					number = number + settings.suffix;
+				}
+				if ( me.__.thousands != '' ){
+					number = me.addThousandsSeparator( number );
+				}
+				if ( me.__.decimal != '.' ){
+					number = number.replace( /\./, me.__.decimal );
+				}
 				return number;
 			}
 		},
 		
 		parseNum: function(_str){
 			var c;
-			var str = '' + _str;
-			if (str.match(/^\(?[\$ -]?[0-9\,\.]+[km ]?\)?$/i)){ 	// parse number (including $10,000; 10K and 100.00)
-				c = parseFloat(str.replace(/[\$,\(\) ]/g,''));
-				if (str.match(/k$/i)) c = c * 1000;
-				if (str.match(/m$/i)) c = c * 1000000;
-				if (str.match(/^\(.*\)$/)) c = -1 * c;
+			var str = ('' + _str).trim();
+			if ( me.regexps.parseNum === false ){
+				var escaped = {
+					prefixes: me.prefixes,
+					suffixes: me.suffixes
+				}
+				$.each( escaped, function( index, what ){
+					$.each( what, function( inner, fix ){
+						what[ inner ] = me.quote( fix );
+					});
+				})
+				//console.log( '^(' + escaped.prefixes.join('|') + ')?[0-9' + me.quote( me.__.decimal ) + me.quote( me.__.thousands ) + ']+(' + escaped.suffixes.join('|') + ')?$' );
+				me.regexps.parseNum = new RegExp( '^(\-|' + escaped.prefixes.join('|') + ')?[0-9' + me.quote( me.__.decimal ) + me.quote( me.__.thousands ) + ']+(' + escaped.suffixes.join('|') + ')?$', 'i' );
+				me.regexps.ignorableChars = [
+					new RegExp( '^(' + escaped.prefixes.join('|') + ')', 'i' ), // strips prefixes
+					new RegExp( '(' + escaped.suffixes.join('|') + ')$', 'i' ), // strips suffixes
+					new RegExp( '[' + me.quote( me.__.thousands ) + ']' ), //strips the thousands separator
+				];
+				me.regexps.decimalPoint = new RegExp( '[' + me.__.decimal + ']' );
+			}
+			//if (str.match(/^\(?[\$ -]?[0-9\,\.]+[km ]?\)?$/i)){ 	// parse number (including $10,000; 10K and 100.00)
+			if ( str.match( me.regexps.parseNum ) ){ 	// parse number (including $10,000; 10K and 100.00)
+				var full_str = str;
+				$.each( me.regexps.ignorableChars, function( index, regexp ){
+					str = str.replace( regexp, '' );
+				});
+				
+				// convert the decimal point to a . ( as that's the only thing parseFloat understands )
+				if ( me.__.decimal != '.' ){
+					str = str.replace( me.regexps.decimalPoint, '.' );
+				}
+				c = parseFloat( str );
+				if (full_str.match(/k$/i)) c = c * 1000;
+				if (full_str.match(/m$/i)) c = c * 1000000;
+				if (full_str.match(/^\(.*\)$/)) c = -1 * c; // if surrounded by parentheses, treat as negative number, 
 				return c;
 			}
 			else if (str.length === 0){
