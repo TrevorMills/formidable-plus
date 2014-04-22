@@ -1,5 +1,8 @@
 <?php
 class FrmPlusDataFromEntriesController{
+	var $enqueued = false;
+	var $particulars = array();
+	
 	public function __construct(){
 		add_action( 'frmplus_register_types', array( &$this, 'register_type' ) );
 		add_action( 'wp_ajax_frmplus_get_field_selection', array( &$this, 'get_field_selection' ) );
@@ -49,6 +52,16 @@ class FrmPlusDataFromEntriesController{
 		else{
 			$options['autocom'] = $options['autocom'] == 'on';
 		}
+		if ( !isset( $options['other'] ) || empty( $options['other']['active'] ) || empty( $options['other']['field'] )){
+			$options['other'] = array( 
+				'active' => false,
+				'function' => null,
+				'id' => null
+			);
+		}
+		else{
+			$options['other']['active'] = $options['other']['active'] == 'yes';
+		}
 		return $options;
 	}
 	
@@ -57,11 +70,10 @@ class FrmPlusDataFromEntriesController{
 		$options = $this->massageOptions( $options );
 		$id = "data-options-" . substr( md5( time() ), 0, 5 ); // random id for the DOM element
 		$forms = $frm_form->getAll( "is_template=0 AND (status is NULL OR status = '' OR status = 'published')", 'order by name');
+	    list($cols,$rows) = FrmPlusFieldsHelper::get_table_options( maybe_unserialize($field->options) );
+		$is_a = substr($index,0,3); // 'row' or 'col'
 		?>
 <div id="<?php echo $id; ?>">
-	<p class="description">
-		<?php _e( 'Blah blah blah', FRMPLUS_PLUGIN_NAME ); ?>
-	</p>
 	<div class="data-options">
 		<div class="section">
 			<label><?php _e( 'Import Data from', FRMPLUS_PLUGIN_NAME ); ?></label><br/>
@@ -74,7 +86,7 @@ class FrmPlusDataFromEntriesController{
 			</select>
 			<div class="data-source-field">
 				<?php if ( !empty( $options['source']['form'] ) ){
-					echo $this->get_field_selection( $options['source']['form'], $options['source']['field'], true ); 
+					echo $this->get_field_selection( $options['source']['form'], $options['source']['field'], 'frmplus_options[source][field]', true ); 
 				} ?>
 			</div>
 		</div>
@@ -93,6 +105,21 @@ class FrmPlusDataFromEntriesController{
 			<label><input type="checkbox" name="frmplus_options[multiselect]" value="on" <?php checked( true, $options['multiselect'] ); ?>><?php _e( 'enable multiselect', FRMPLUS_PLUGIN_NAME ); ?></label>
 			<label><input type="checkbox" name="frmplus_options[autocom]" value="on" <?php checked( true, $options['autocom'] ); ?>><?php _e( 'enable autocomplete', FRMPLUS_PLUGIN_NAME ); ?></label>
 		</div>
+		<div class="section">
+			<label><input type="checkbox" name="frmplus_options[other][active]" value="yes" <?php checked( true, $options[ 'other' ]['active'] ); ?>> <?php _e( 'Place the corresponding value(s) from ', FRMPLUS_PLUGIN_NAME ); ?></label>
+			<span class="data-source-field" data-field-name="frmplus_options[other][field]">
+				<?php if ( !empty( $options['source']['form'] ) ){
+					echo $this->get_field_selection( $options['source']['form'], $options['other']['field'], 'frmplus_options[other][field]', true ); 
+				} ?>
+			</span>
+			<span> <?php _e( 'into', FRMPLUS_PLUGIN_NAME ); ?> </span>
+			<select name="frmplus_options[other][cell]">
+				<option value="">--<?php _e( 'Choose a cell', FRMPLUS_PLUGIN_NAME ); ?>--</option>
+				<?php foreach ( ( $is_a == 'row' ? $rows : $cols ) as $key => $opt ) : if ( $key == $index ) continue; ?>
+					<option value="<?php echo $key; ?>" <?php selected( $key, $options['other']['cell'] ); ?>><?php echo FrmPlusFieldsHelper::parse_option( $opt, 'name' ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</div>
 	</div>
 </div>
 <script type="text/javascript">
@@ -104,7 +131,12 @@ jQuery( function($){
 				action: 'frmplus_get_field_selection',
 				form_id: $(this).val()
 			},function( markup ){
-				$( '#<?php echo $id; ?> .data-source-field' ).html( markup );
+				$( '#<?php echo $id; ?> .data-source-field' ).each( function(){
+					$(this).html( markup );
+					if ( $(this).data( 'field-name' ) ){
+						$(this).find( 'select' ).attr( 'name', $(this).data( 'field-name' ) );
+					}
+				});
 			});
 		}
 	});
@@ -113,7 +145,7 @@ jQuery( function($){
 		<?php
 	}
 	
-	public function get_field_selection( $form_id = null, $field_id = null, $return = false){
+	public function get_field_selection( $form_id = null, $field_id = null, $field_name = 'frmplus_options[source][field]', $return = false){
 		if ( defined( 'DOING_AJAX' ) ){
 			extract( $_POST );
 		}
@@ -132,7 +164,7 @@ jQuery( function($){
 		}
 		ob_start(); 
 		if ( $fields || $taxonomies ) :?>
-			<select name="frmplus_options[source][field]">
+			<select name="<?php echo $field_name; ?>">
 			<?php if ( $fields ) : ?>
 				<option value="">--<?php _e( 'Select Field', FRMPLUS_PLUGIN_NAME ); ?>--</option>
 				<?php foreach ( $fields as $field ) : ?>
@@ -240,6 +272,60 @@ jQuery( function($){
 		<?php
 			break;
 		}
+		static $once;
+		if ( !isset( $once ) ){
+			$once = array();
+		}
+		$selector = $precedence . '-' . ( $precedence == 'row' ? $row_num : $col_num );
+		if ( $options['other']['active'] && !isset( $once[ $field['id'] . $selector ] ) ){
+			list( $columns, $rows ) = FrmPlusFieldsHelper::get_table_options( $field['options'] );
+			if ( !$this->enqueued ){
+				$this->enqueued = true;
+			    wp_enqueue_script( 'frm-plus-data-from-entries', plugins_url( 'formidable-plus/js/frm-plus-data-from-entries.js' ), array( 'jquery' ) );
+				add_action( ( is_admin() && !defined( 'DOING_AJAX' ) ) ? 'admin_footer' : 'wp_footer', array( &$this, 'localize_script' ) );
+			}
+				
+			$once[ $field['id'] . $selector ] = true; 
+			if ( !isset( $this->particulars[ $field['id'] ] ) ){
+				$this->particulars[ $field['id'] ] = array();
+			}
+			if ( !isset( $this->particulars[ $field['id'] ][ 'others' ] ) ){
+				$this->particulars[ $field['id'] ][ 'others' ] = array();
+			}
+			$this->particulars[ $field['id'] ]['others'][ $selector ] = array(
+				'map' => $this->get_other_values( $options['other']['field'], $values ),
+				'target' => $precedence . '-' . array_search( $options['other']['cell'], array_keys( $precedence == 'row' ? $rows : $columns ) )
+			);
+		}
+	}
+	
+	public function get_other_values( $other_id, $values ){
+		global $frmdb, $wpdb;
+		$entry_ids = array_filter( array_keys( $values ) );
+		$query = $wpdb->prepare( "
+			SELECT 
+				m.item_id,
+				m.meta_value 
+			FROM $frmdb->entry_metas m 
+			WHERE m.field_id = %d 
+			  AND m.item_id IN ( " . implode( ',', array_fill( 0, count( $entry_ids ), '%d' ) ) . " )
+			", array_merge( array( $other_id ), $entry_ids ) );
+		
+		$results = $wpdb->get_results( $query );
+		$return = array();
+		foreach ( $results as $result ){
+			$return[ $result->item_id ] = $result->meta_value;
+		}
+		return $return;
+	}
+	
+	public function localize_script(){
+		wp_localize_script( 'frm-plus-data-from-entries', 'FRM_PLUS_DATA_FROM_ENTRIES', 
+			apply_filters( 'frm-plus-data-from-entries-localization', array( 
+				'particulars' => $this->particulars,
+				'__' => array()
+			))
+		);
 	}
 	
 	public function display_callback( $args ){

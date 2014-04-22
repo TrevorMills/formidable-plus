@@ -151,7 +151,7 @@ class FrmPlusCalculationsController{
 			<select name="frmplus_options[other][id]">
 				<option value="">--<?php _e( 'Choose a field', FRMPLUS_PLUGIN_NAME ); ?>--</option>
 				<?php foreach ( $fields as $f ) : ?>
-					<option value="<?php echo $f->id; ?>" <?php selected( $f->id, $options['other']['id'] ); ?>><?php echo $f->name; ?>
+					<option value="<?php echo $f->id; ?>" <?php selected( $f->id, $options['other']['id'] ); ?>><?php echo $f->name; ?></option>
 				<?php endforeach; ?>
 			</select>
 		</div>
