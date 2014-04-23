@@ -263,7 +263,7 @@ jQuery( function($){
 			?>
 			<select class="<?php echo ( $options['autocom'] ? 'frm_chzn' : '' ); ?>" <?php echo ( $options['multiselect'] ? 'multiple data-placeholder=" "' : '' ); ?> name="<?php echo "{$this_field_name}[$col_num]" . ( $options['multiselect'] ? '[]' : '' ); ?>" id="<?php echo $this_field_id; ?>">
 				<?php foreach ( $values as $k => $v ) : if ( $options['multiselect'] && $v == '' ) continue; ?>
-				<option value="<?php echo esc_attr( $k ); ?>" <?php selected( true, is_array( $value ) ? in_array( $k, $value ) : $k == $value ); ?>><?php echo $v; ?></option>
+				<option value="<?php echo esc_attr( $k ); ?>" <?php selected( true, is_array( $value ) ? in_array( $k, $value ) : $k == $value ); ?>><?php echo $v . ( empty( $v ) ? '&nbsp;' : '' ); ?></option>
 				<?php endforeach; ?>
 			</select>
 		<?php
