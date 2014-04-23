@@ -68,7 +68,7 @@ jQuery( function($){
 		$options = $this->massageOptions( $options );
 
 		if ( $options['multiline'] ){
-			echo "<textarea readonly name=\"{$this_field_name}[$col_num]\" id=\"$this_field_id\" class=\"auto_width table-cell readonly\"/>" . esc_html( $options['text'] ) . '</textarea>';
+			echo "<textarea readonly name=\"{$this_field_name}[$col_num]\" id=\"$this_field_id\" class=\"auto_width table-cell readonly\" >" . esc_html( $options['text'] ) . '</textarea>';
 			echo '
 <script type="text/javascript">
 	jQuery(function($){

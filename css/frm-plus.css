@@ -78,12 +78,15 @@
 	filter: alpha(opacity=100);
 	border:none;
 	color:inherit !important;
+	width:100%;
+	min-width:100px;
 }
 .with_frm_style .frm-table textarea.readonly,
 .frm-table textarea.readonly{
 	overflow:hidden;
 	resize:none;
 	width:100%;
+	min-width:200px;
 }
 .with_frm_style .frm-table label{
 	display:block;
