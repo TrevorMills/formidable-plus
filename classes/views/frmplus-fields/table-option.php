@@ -4,7 +4,7 @@
 		<a href="javascript:frm_delete_field_option(<?php echo $field['id']?>, '<?php echo $opt_key ?>',ajaxurl);" class="frm_single_visible_hover alignleft" ><img src="<?php echo FRM_IMAGES_URL ?>/trash.png" alt="Delete"></a>
 	    <a href="javascript:void(0);" class="frm_single_visible_hover alignleft frm_sortable_handle" ><img src="<?php echo FRM_IMAGES_URL ?>/move.png" alt="Reorder"></a>
     <?php else : // newer version, do it the new way ?>
-		<a href="javascript:void(0)" class="frm_single_visible_hover frm_icon_font frm_delete_icon" style="visibility: hidden;"> </a>
+		<a href="javascript:void(0)" class="frm_single_visible_hover frm_icon_font frm_delete_icon frm_delete_field_<?php echo substr( $opt_key, 0, 3 ); ?>" style="visibility: hidden;"> </a>
 	    <a href="javascript:void(0);" class="frm_single_visible_hover alignleft frm_sortable_handle frm_icon_font frm_move_field" > </a>
 	<?php endif; ?>
 	<?php

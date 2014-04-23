@@ -1,6 +1,6 @@
-<div class="dynamic-table-options">
+<div class="dynamic-table-options" <?php if ( !empty( $rows ) ) : ?>style="display:none"<?php endif; ?>>
 	<p class="description">
-		<?php _e( 'This is a dynamic field that allows the user to add arbitrary rows.  You can set a few options below:', FRMPLUS_PLUGIN_NAME ); ?>
+		<?php _e( 'Because you have no rows defined, this is a dynamic table; the user can add, delete and sort rows themselves.  You can set a few options below:', FRMPLUS_PLUGIN_NAME ); ?>
 	</p>
 	<div class="dynamic-options">
 		<?php $dynamic_options = FrmPlusFieldsHelper::get_dynamic_options( $field ); $_d = & $dynamic_options; // shorthand?>

@@ -56,3 +56,8 @@
 	padding:0.5em;
 	margin-bottom: 0.5em;
 }
+.dynamic-table-options{
+	border: 1px solid #d1e5ee;
+	padding: 15px;
+	background: #fafafa;
+}

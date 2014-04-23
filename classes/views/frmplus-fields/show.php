@@ -18,15 +18,15 @@
 	<div id="frm_row_list_<?php echo $field['id']; ?>">
 
 		<div id="frm_field_row_<?php echo $field['id']; ?>_opts">
+		<?php require( 'dynamic-table-options.php' ); ?>
 <?php
 		foreach ($rows as $opt_key => $opt){
 			require('table-option.php');
 		}
 ?>		
-		<?php if ( empty( $rows ) ){ require( 'dynamic-table-options.php' ); } ?>
 		</div>
 	    <div id="frm_add_field_row_<?php echo $field['id']; ?>" class="frm-show-click-row">
-	        <a href="javascript:frm_add_field_option('<?php echo 'row_'.$field['id']; ?>')"><span class="ui-icon ui-icon-plusthick alignleft"></span> <?php _e( 'Add a Row', FRMPLUS_PLUGIN_NAME ); ?></a>
+	        <a class="frm_add_field_row" href="javascript:frm_add_field_option('<?php echo 'row_'.$field['id']; ?>')"><span class="ui-icon ui-icon-plusthick alignleft"></span> <?php _e( 'Add a Row', FRMPLUS_PLUGIN_NAME ); ?></a>
 	        <?php do_action('frm_add_multiple_opts', $field); ?>
 	    </div>
 	</div> <!-- frm_row_list_<?php echo $field['id']; ?> -->

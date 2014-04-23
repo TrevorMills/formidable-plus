@@ -79,7 +79,44 @@ jQuery(function($){
 				.on( 'change', '.frmplus_options_form input[name*="all_columns"]', function(){
 					$( this ).parents( '.all_columns' ).next( '.select_columns' ).slideToggle();
 				})
+				.on( 'click', '.frm_add_field_row', function(){
+					var $options = $(this).closest( '.ui-sortable' ).find( '.dynamic-table-options' );
+					if ( $options.is( ':visible' ) ){
+						var hideMe = function(){
+							$( document ).off( 'ajaxComplete', hideMe );
+							if ( $options.is( ':visible' ) ){
+								$options.fadeOut({queue: false}).slideToggle({queue: false});
+							}
+						}
+						$( document ).on( 'ajaxComplete', hideMe );
+					}
+				})
+				.on( 'click', '.frm_delete_field_row', function(){
+					// If they're deleting the last row, wait for thr XHR to return and then show the dynamic options
+					var $siblings = $(this).closest( '.frm_single_option_sortable' ).siblings( '.frm_single_option_sortable' ),
+						has_visible_siblings = false;
+					
+					$siblings.each( function(){
+						if ( $(this).find( '.frm_single_option' ).is( ':visible' ) ){
+							has_visible_siblings = true;
+							return false;
+						}
+					});
+					if ( !has_visible_siblings ){
+						var $options = $(this).closest( '.ui-sortable' ).find( '.dynamic-table-options' );
+						var showMe = function(){
+							$( document ).off( 'ajaxComplete', showMe );
+							if ( !$options.is( ':visible' ) ){
+								setTimeout( function(){
+									$options.fadeIn({queue: false});
+								}, 600 ); // timeout to coincide with when the option has faded out
+							}
+						}
+						$( document ).on( 'ajaxComplete', showMe );
+					}
+				})
 				;
+				
 		}
 	});
 	

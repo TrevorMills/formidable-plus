@@ -15,12 +15,12 @@ if ( !isset( $display_only ) ){
 	list($columns,$rows) = FrmPlusFieldsHelper::get_table_options($field['options']);
 	echo apply_filters('frm-table-container-extras','',$field['id']);
 	$dynamic_options = FrmPlusFieldsHelper::get_dynamic_options( $field ); 
-	if ( $dynamic_options->rows_sortable && $display_only !== true ){
+	if ( $dynamic_options->is_dynamic && $dynamic_options->rows_sortable && $display_only !== true ){
 		wp_enqueue_script( 'jquery-ui-sortable' );
 	}
 ?>
 <div id="frm-table-container-<?php echo $field['id']; ?>" class="frm-table-container">
-<table id="frm-table-<?php echo $field['id']; ?>" class="frm-table<?php if (count($classes = apply_filters('frm_table_classes',array(),$field['id']))) echo ' '.join(' ',$classes); ?> <?php if ( $dynamic_options->rows_sortable && $display_only !== true ) : ?>ui-sortable<?php endif; ?>">
+<table id="frm-table-<?php echo $field['id']; ?>" class="frm-table<?php if (count($classes = apply_filters('frm_table_classes',array(),$field['id']))) echo ' '.join(' ',$classes); ?> <?php if ( $dynamic_options->is_dynamic && $dynamic_options->rows_sortable && $display_only !== true ) : ?>ui-sortable<?php endif; ?>">
 <?php if (count($columns)) : ?>
 	<?php // First Row - Column Headers ?>
 	<thead>

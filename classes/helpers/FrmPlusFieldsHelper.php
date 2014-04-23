@@ -644,10 +644,12 @@ class FrmPlusFieldsHelper{
 	
 	public static function get_dynamic_options( $field ){
 		$field = (object)$field;
+		list( $columns, $rows ) = FrmPlusFieldsHelper::get_table_options( $field->options );
 		if ( isset( $field->field_options ) ){
 			$field = (object)$field->field_options;
 		}
 		$options = new stdClass;
+		$options->is_dynamic = count( $rows ) ? false : true;
 		if ( !isset( $field->starting_rows ) || !is_numeric( $field->starting_rows ) ){
 			$options->starting_rows = 1;
 		}
@@ -678,10 +680,12 @@ class FrmPlusFieldsHelper{
 	public function default_field_opts( $opts, $values, $field ){
 		if ( $field->type == 'table' ){
 			$options = self::get_dynamic_options( $field );
-			$opts[ 'starting_rows' ] = $options->starting_rows;
-			$opts[ 'rows_sortable' ] = $options->rows_sortable;
-			$opts[ 'add_row_text' ] = $options->add_row_text;
-			$opts[ 'delete_row_text' ] = $options->delete_row_text;
+			if ( $options->is_dynamic ){
+				$opts[ 'starting_rows' ] = $options->starting_rows;
+				$opts[ 'rows_sortable' ] = $options->rows_sortable;
+				$opts[ 'add_row_text' ] = $options->add_row_text;
+				$opts[ 'delete_row_text' ] = $options->delete_row_text;
+			}
 		}
 		return $opts;
 	}
