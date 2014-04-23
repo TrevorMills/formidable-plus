@@ -34,10 +34,31 @@ class FrmPlusStaticController{
 	<div class="section">
 		<label><?php _e( 'Text', FRMPLUS_PLUGIN_NAME ); ?>: </label>
 		<span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php echo esc_attr( __( 'The readonly string to insert into the table', FRMPLUS_PLUGIN_NAME ) ); ?>"></span>
-		<input type="text" name="frmplus_options[text]" value="<?php echo esc_attr($options['text']); ?>" ><br/>
+		<?php if ( $options['multiline'] ) : ?>
+			<textarea name="frmplus_options[text]"><?php echo esc_html( $options['text'] ); ?></textarea>
+		<?php else: ?>
+			<input type="text" name="frmplus_options[text]" value="<?php echo esc_attr($options['text']); ?>" >
+		<?php endif; ?>
+		<br/>
 		<label><input type="checkbox" name="frmplus_options[multiline]" value="yes" <?php checked( true, $options['multiline'] ); ?>> <?php _e( 'Multiline', FRMPLUS_PLUGIN_NAME ); ?></label>
 	</div>
 </div>
+<script type="text/javascript">
+jQuery( function($){
+	$( '#<?php echo $id; ?>' ).on( 'change', '[name="frmplus_options[multiline]"]', function(){
+		var $input = $(this).closest( '.section' ).find( '[name="frmplus_options[text]"]' ),
+			value = $input.val();
+			
+		if ( $(this).is( ':checked' ) ){
+			$input.after( $( '<textarea name="frmplus_options[text]" />').val( value ) );
+		}
+		else{
+			$input.after( $( '<input type="text" name="frmplus_options[text]" />').val( value ) );
+		}
+		$input.remove();
+	});
+});
+</script>
 	<?php
 	}
 
