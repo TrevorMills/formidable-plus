@@ -1,4 +1,3 @@
-
 .frm-table{
 	border-collapse:collapse;
 	border:1px solid black;
@@ -88,4 +87,10 @@
 }
 .with_frm_style .frm-table label{
 	display:block;
+}
+.ui-sortable-placholder{
+	visibility: visible !important;
+}
+.ui-sortable-helper{
+	background:#F5F5F5;
 }

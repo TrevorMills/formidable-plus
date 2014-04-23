@@ -10,6 +10,7 @@ class FrmPlusFieldsHelper{
 		add_action('frm_entry_form', array(&$this,'render_massage_bookings'),10,3);
 		add_action('init', array(&$this,'perform_massage'));
 		add_action('frm_setup_edit_fields_vars',array(&$this,'setup_edit_field_vars'),10,3);
+		add_filter('frm_default_field_opts', array( &$this, 'default_field_opts' ), 10, 3 );
         //add_filter('frm_get_default_value', array($this, 'get_default_value')); // TODO make this work with current version.
 		
 		// Doing it on after_setup_theme as opposed to init because FrmPlusAppController does an 'init' on precedence 1.  
@@ -639,6 +640,50 @@ class FrmPlusFieldsHelper{
 		}
 			
 		return $field;
+	}
+	
+	public static function get_dynamic_options( $field ){
+		$field = (object)$field;
+		if ( isset( $field->field_options ) ){
+			$field = (object)$field->field_options;
+		}
+		$options = new stdClass;
+		if ( !isset( $field->starting_rows ) || !is_numeric( $field->starting_rows ) ){
+			$options->starting_rows = 1;
+		}
+		else{
+			$options->starting_rows = intval( $field->starting_rows );
+		}
+		if ( !isset( $field->rows_sortable ) ){
+			$options->rows_sortable = false;
+		}
+		else{
+			$options->rows_sortable = $field->rows_sortable == 'yes';
+		}
+		if ( !isset( $field->add_row_text ) ){
+			$options->add_row_text = __( 'Add Row', FRMPLUS_PLUGIN_NAME );
+		}
+		else{
+			$options->add_row_text = $field->add_row_text;
+		}
+		if ( !isset( $field->delete_row_text ) ){
+			$options->delete_row_text = __( 'Delete Row', FRMPLUS_PLUGIN_NAME );
+		}
+		else{
+			$options->delete_row_text = $field->delete_row_text;
+		}
+		return $options;
+	}
+	
+	public function default_field_opts( $opts, $values, $field ){
+		if ( $field->type == 'table' ){
+			$options = self::get_dynamic_options( $field );
+			$opts[ 'starting_rows' ] = $options->starting_rows;
+			$opts[ 'rows_sortable' ] = $options->rows_sortable;
+			$opts[ 'add_row_text' ] = $options->add_row_text;
+			$opts[ 'delete_row_text' ] = $options->delete_row_text;
+		}
+		return $opts;
 	}
 
 }

@@ -2,14 +2,14 @@
 delete_row = function(field_id,row){
 	jQuery(function(){
 		if (jQuery('#frm-table-' + field_id + ' tr').length == 2){ // header row and only one data row
-			alert('Sorry, you must leave at least one row in this table.');
+			alert( FRM_PLUS_FRONT.leave_one_row );
 		}
 		else{
 			var data_exists = false;
 			jQuery('#frm-table-' + field_id + ' tr.row-' + row).find('.table-cell').each(function(){
 				if (jQuery(this).val() != "") data_exists = true;
 			});
-			if (!data_exists || confirm('Are you sure you wish to permanently delete this row?  This cannot be undone.')){
+			if (!data_exists || confirm( FRM_PLUS_FRONT.are_you_sure )){
 				jQuery('#frm-table-' + field_id + ' tr.row-' + row).remove();
 				adjust_row_numbers(field_id);
 				post_delete_row(field_id); // Deprecated.  Use the event below
@@ -215,3 +215,25 @@ jQuery(document).ready(function(){
 		jQuery('#table_header_tip').remove();
 	});
 });
+
+jQuery( function($){
+	$( 'table.frm-table.ui-sortable' ).sortable({
+		axis: 'y',
+		handle: '.frmplus-sort-row',
+		items: 'tbody tr',
+		helper: function(e, tr){
+		    var $originals = tr.children();
+		    var $helper = tr.clone();
+		    $helper.children().each(function(index){
+		      	$(this).width($originals.eq(index).width() + parseInt($originals.eq(index).css('borderLeftWidth')));
+		    });
+		    return $helper;
+		},
+		stop: function(){
+			var id = $(this).attr('id').match( /[0-9]+$/ )[0]
+			adjust_row_numbers( id );
+			$(this).trigger( 'sort_rows', [ id ] );
+		},
+	});
+});
+

@@ -7,6 +7,7 @@ jQuery( function($){
 				particular.start = me.findStart( particular.start, particular.style );
 				$( '#frm-table-' + particular.id ).on( 'add_row', null, particular, me.do_the_do );
 				$( '#frm-table-' + particular.id ).on( 'delete_row', null, particular, me.do_the_do );
+				$( '#frm-table-' + particular.id ).on( 'sort_rows', null, particular, me.do_the_do );
 				// do it now
 				me.do_the_do( {
 					data: particular

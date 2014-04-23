@@ -11,7 +11,7 @@
 ?>	
 		</div>
 		<div id="frm_add_field_col_<?php echo $field['id']; ?>" class="frm-show-click-col"> <?php // had to change this class to get the thing to appear ?>
-		    <a href="javascript:frm_add_field_option('<?php echo 'col_'.$field['id']; ?>')"><span class="ui-icon ui-icon-plusthick alignleft"></span> Add a Column</a>
+		    <a href="javascript:frm_add_field_option('<?php echo 'col_'.$field['id']; ?>')"><span class="ui-icon ui-icon-plusthick alignleft"></span> <?php _e( 'Add a Column', FRMPLUS_PLUGIN_NAME ); ?></a>
 		</div>
 	</div> <!-- frm_column_list_<?php echo $field['id']; ?> -->
 		<br/>Row Headings<br/>
@@ -23,9 +23,10 @@
 			require('table-option.php');
 		}
 ?>		
+		<?php if ( empty( $rows ) ){ require( 'dynamic-table-options.php' ); } ?>
 		</div>
 	    <div id="frm_add_field_row_<?php echo $field['id']; ?>" class="frm-show-click-row">
-	        <a href="javascript:frm_add_field_option('<?php echo 'row_'.$field['id']; ?>')"><span class="ui-icon ui-icon-plusthick alignleft"></span> Add a Row</a>
+	        <a href="javascript:frm_add_field_option('<?php echo 'row_'.$field['id']; ?>')"><span class="ui-icon ui-icon-plusthick alignleft"></span> <?php _e( 'Add a Row', FRMPLUS_PLUGIN_NAME ); ?></a>
 	        <?php do_action('frm_add_multiple_opts', $field); ?>
 	    </div>
 	</div> <!-- frm_row_list_<?php echo $field['id']; ?> -->

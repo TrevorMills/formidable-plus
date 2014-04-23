@@ -11,6 +11,10 @@ class FrmPlusAppController{
         wp_enqueue_style('frmplus-forms', $css);
 		$script = apply_filters('get_frmplus_script', FRMPLUS_URL .'/js/frm_plus.js');
         wp_enqueue_script('frmplus-scripts', $script, array('jquery'));
+		wp_localize_script( 'frmplus-scripts', 'FRM_PLUS_FRONT', array(
+			'are_you_sure' => __( 'Are you sure you wish to permanently delete this row?  This cannot be undone.', FRMPLUS_PLUGIN_NAME ),
+			'leave_one_row' => __( 'Sorry, you must leave at least one row in this table.', FRMPLUS_PLUGIN_NAME )
+		));
 		if (!is_admin() or ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ){
 			add_action('wp_print_scripts',array($this,'declare_ajaxurl'));
 		}

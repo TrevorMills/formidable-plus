@@ -256,15 +256,18 @@ class FrmPlusFieldsController{
         global $frm_field;
 		extract($_POST);
 
-        $field_data = $frm_field->getOne($field_id);
+        $field_data = $frm_field->getOne($field_id );
         $options = maybe_unserialize($field_data->options);
 	    list($columns,$rows) = FrmPlusFieldsHelper::get_table_options($options);
 	
+		/*
         $field = array();
         $field['field_key'] = $field_data->field_key;
         $field['type'] = $field_data->type;
         $field['id'] = $field_id;
 		$field['options'] = $field_data->options;
+		*/
+		$field = (array)$field_data;
         $field_name = "item_meta[$field_id]";
 		ob_start();
 		require(FRMPLUS_VIEWS_PATH.'/frmplus-fields/table-row.php');
