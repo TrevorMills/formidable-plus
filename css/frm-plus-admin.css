@@ -69,3 +69,11 @@
 .dynamic-options label.auto_width{
 	width:auto;
 }
+.frm_remove_other:before {
+	content: '\e600';
+	vertical-align: middle;
+}
+.frm_add_other:before {
+	content: '\e602';
+	vertical-align: middle;
+}

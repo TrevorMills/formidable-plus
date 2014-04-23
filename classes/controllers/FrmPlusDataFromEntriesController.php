@@ -55,13 +55,22 @@ class FrmPlusDataFromEntriesController{
 		if ( !isset( $options['other'] ) || empty( $options['other']['active'] ) || empty( $options['other']['field'] )){
 			$options['other'] = array( 
 				'active' => false,
-				'function' => null,
-				'id' => null
+				'field' => array( null ),
+				'cell' => array( null )
 			);
 		}
 		else{
 			$options['other']['active'] = $options['other']['active'] == 'yes';
+			foreach ( array( 'field', 'cell' ) as $what ){
+				if ( isset( $options['other'][ $what ] ) && !is_array( $options['other'][ $what ] ) ){
+					$options['other'][ $what ] = array( $options['other'][ $what ] );
+				}
+				if ( !isset( $options['other'][ $what ] ) ){
+					$options['other'][ $what ] = array( null ); // start with one
+				}
+			}
 		}
+		
 		return $options;
 	}
 	
@@ -106,19 +115,27 @@ class FrmPlusDataFromEntriesController{
 			<label><input type="checkbox" name="frmplus_options[autocom]" value="on" <?php checked( true, $options['autocom'] ); ?>><?php _e( 'enable autocomplete', FRMPLUS_PLUGIN_NAME ); ?></label>
 		</div>
 		<div class="section other" <?php if ( empty( $options['source']['form'] ) || empty( $options['source']['field'] ) ) : ?>style="display:none"<?php endif; ?>>
-			<label><input type="checkbox" name="frmplus_options[other][active]" value="yes" <?php checked( true, $options[ 'other' ]['active'] ); ?>> <?php _e( 'Place the corresponding value(s) from ', FRMPLUS_PLUGIN_NAME ); ?></label>
-			<span class="data-source-field" data-field-name="frmplus_options[other][field]">
-				<?php if ( !empty( $options['source']['form'] ) ){
-					echo $this->get_field_selection( $options['source']['form'], $options['other']['field'], 'frmplus_options[other][field]', true ); 
-				} ?>
-			</span>
-			<span> <?php _e( 'into', FRMPLUS_PLUGIN_NAME ); ?> </span>
-			<select name="frmplus_options[other][cell]">
-				<option value="">--<?php _e( 'Choose a cell', FRMPLUS_PLUGIN_NAME ); ?>--</option>
-				<?php foreach ( ( $is_a == 'row' ? $rows : $cols ) as $key => $opt ) : if ( $key == $index ) continue; ?>
-					<option value="<?php echo $key; ?>" <?php selected( $key, $options['other']['cell'] ); ?>><?php echo FrmPlusFieldsHelper::parse_option( $opt, 'name' ); ?></option>
-				<?php endforeach; ?>
-			</select>
+			<label><input type="checkbox" name="frmplus_options[other][active]" value="yes" <?php checked( true, $options[ 'other' ]['active'] ); ?>> <?php _e( 'Also place corresponding value(s) from same entry', FRMPLUS_PLUGIN_NAME ); ?></label>
+			<div class="other-details-wrapper" <?php if ( !$options['other']['active'] ) : ?>style="display:none"<?php endif; ?>>
+			<?php foreach ( $options['other']['field'] as $f => $particular ) : ?>
+				<div class="other-details">
+					<span class="data-source-field" data-field-name="frmplus_options[other][field][]">
+						<?php if ( !empty( $options['source']['form'] ) ){
+							echo $this->get_field_selection( $options['source']['form'], $particular, 'frmplus_options[other][field][]', true ); 
+						} ?>
+					</span>
+					<span> <?php _e( 'into', FRMPLUS_PLUGIN_NAME ); ?> </span>
+					<select name="frmplus_options[other][cell][]">
+						<option value="">--<?php _e( 'Choose a cell', FRMPLUS_PLUGIN_NAME ); ?>--</option>
+						<?php foreach ( ( $is_a == 'row' ? $rows : $cols ) as $key => $opt ) : if ( $key == $index ) continue; ?>
+							<option value="<?php echo $key; ?>" <?php selected( $key, $options['other']['cell'][ $f ] ); ?>><?php echo FrmPlusFieldsHelper::parse_option( $opt, 'name' ); ?></option>
+						<?php endforeach; ?>
+					</select>
+					<a class="frm_remove_other frm_icon_font"></a>
+					<a class="frm_add_other frm_icon_font"></a>
+				</div>
+			<?php endforeach; ?>
+			</div>
 		</div>
 	</div>
 </div>
@@ -126,7 +143,7 @@ class FrmPlusDataFromEntriesController{
 jQuery( function($){
 	$( '#<?php echo $id; ?>' ).on( 'change', '.select-form', function(){
 		$( '#<?php echo $id; ?> .data-source-field' ).empty();
-		$( '#<?php echo $id; ?> .other' ).hide().find( 'input[type="checkbox"]' ).removeAttr( 'checked' );
+		$( '#<?php echo $id; ?> .other' ).hide().find( 'input[type="checkbox"]' ).removeAttr( 'checked' ).trigger( 'change' );
 		if ( $(this).val() != '' ){
 			$.post( ajaxurl, {
 				action: 'frmplus_get_field_selection',
@@ -147,7 +164,32 @@ jQuery( function($){
 		else{
 			$( '#<?php echo $id; ?> .other' ).hide().find( 'input[type="checkbox"]' ).removeAttr( 'checked' );
 		}
+	}).on( 'change', '[name="frmplus_options[other][active]"]', function(){
+		var $wrapper = $(this).closest( '.section' ).find( '.other-details-wrapper' );
+		if ( $(this).is( ':checked' ) ){
+			$wrapper.fadeIn();
+		}
+		else{
+			$wrapper.fadeOut();
+		}
+	}).on( 'click', '.frm_remove_other', function(){
+		var $details = $(this).closest( '.other-details' ),
+			$active = $(this).closest( '.section' ).find( '[name="frmplus_options[other][active]"]' );
+		if ( $details.siblings( '.other-details' ).length ){
+			$details.remove();
+		}
+		else{
+			// last one
+			$details.find( ':input' ).val( '' );
+			$active.removeAttr( 'checked' );
+		}
+		$active.trigger( 'change' );
+	}).on( 'click', '.frm_add_other', function(){
+		var $details = $(this).closest( '.other-details' ).clone();
+		$details.find( ':input' ).val( '' );
+		$(this).closest( '.other-details' ).after( $details );
 	});
+	;
 })
 </script>
 		<?php
@@ -205,6 +247,7 @@ jQuery( function($){
 		if ( !isset( $values_cache[ $options['source']['form'] ] ) ){
 			$values_cache[ $options['source']['form'] ] = array();
 		}
+		
 		$cache = & $values_cache[ $options['source']['form'] ][ $options['source']['field'] ]; // shorthand
 		
 		if ( isset( $cache ) ){
@@ -301,16 +344,22 @@ jQuery( function($){
 			if ( !isset( $this->particulars[ $field['id'] ][ 'others' ] ) ){
 				$this->particulars[ $field['id'] ][ 'others' ] = array();
 			}
-			$this->particulars[ $field['id'] ]['others'][ $selector ] = array(
-				'map' => $this->get_data_values( array( 
-					'source' => array(
-						'field' => $options['other']['field'],
-						'form' => $options['source']['form']
-					),
-					'restrict' => $options['restrict']
-				) ),
-				'target' => $precedence . '-' . array_search( $options['other']['cell'], array_keys( $precedence == 'row' ? $rows : $columns ) )
-			);
+			if ( !isset( $this->particulars[ $field['id'] ]['others'][ $selector ] ) ){
+				$this->particulars[ $field['id'] ]['others'][ $selector ] = array();
+			}
+			
+			foreach ( $options['other']['field'] as $index => $particular ){
+				$this->particulars[ $field['id'] ]['others'][ $selector ][] = array(
+					'map' => $this->get_data_values( array( 
+						'source' => array(
+							'field' => $particular,
+							'form' => $options['source']['form']
+						),
+						'restrict' => $options['restrict']
+					) ),
+					'target' => $precedence . '-' . array_search( $options['other']['cell'][ $index ], array_keys( $precedence == 'row' ? $rows : $columns ) )
+				);
+			}
 		}
 	}
 	
