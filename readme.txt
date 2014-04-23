@@ -3,7 +3,7 @@ Contributors: topquarky
 Tags: formidable, forms, table, new field-type
 Requires at least: 2.5 ( Formidable Pro 1.07.04 or higher is required )
 Tested up to: 3.8.2
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 
 This plugin adds a new field type to the Formidable Pro plugin.  It allows you to add a table to your form.
 
@@ -44,12 +44,28 @@ When you add a table field to your form, the edit widget gives you a dropdown bo
 * Calculation - give a sum, average or count of fields in the table
 * Data From Entries - create select, checkbox or radio field based on values entered in another form, or from a WordPress taxonomy
 * Incrementer - a readonly incrementing number
+* Static - a readonly block of text, single or multiline
 
 = I tried to upgrade and received a message The package could not be installed. PCLZIP_ERR_BAD_FORMAT (-10) : Unable to find End of Central Dir Record signature = 
 It’s most likely that the Top Quark credentials are not entered properly on the Settings > Formidable Plus page.  Go there, enter the credentials you received when you purchased the plugin, get the "Awesome! You're good to go!" message, and then visit your plugins page. Add `?forceCheck=true` to the end of the plugins.php url.  Then, you should be able to run the update properly.
 
 = I see there's an update, but it says my subscription has run out.  What's up? = 
 It’s most likely that the Top Quark credentials are not entered properly on the Settings > Formidable Plus page.  Go there, enter the credentials you received when you purchased the plugin, get the "Awesome! You're good to go!" message, and then visit your plugins page. Add `?forceCheck=true` to the end of the plugins.php url.  Then, you should be able to run the update properly.
+
+= In a custom view, can I control which rows/columns appear? = 
+Yes.  Within the shortcode you're adding to the view, add in any of the following attributes:
+* include_rows - display only these rows
+* include_columns - display only these columns
+* exclude_rows - do not display these rows
+* exclude_columns - do not display these columns
+* hide_row_headers - set to 'true' to not display the row headers
+* hide_column_headers - set to 'true' to not display the column headers
+
+For the include/exclude attributes, use the row/column name, or the index (starting with 0 for the first row). 
+
+Here's an example:
+
+`[1228 include_rows="Fruit,Store,Price" exclude_columns="Potential Business" hide_row_headers=true]`
 
 = I'm a developer; is there a way for me to add my own field type? =
 Yes.  See the controller files for Calculations, DataFromEntries, DatePicker and Incrementer in the `formidable-plus/classes/controllers/` directory for examples on how to do this.  
@@ -139,6 +155,15 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 
 
 == Changelog ==
+
+= 1.2.2 = 
+* New: calculation fields can have a prefix (like $) or suffix
+* New: added ability to localize calculation fields (decimal character, thousands separator)
+* New: added ability to hide row or column headings for table field in custom display
+* New: added ability to include or exclude rows or columns when adding table field to custom display
+* Fix: Bug that could have caused data corruption under some circumstances when reordering or deleting rows/columns
+* New: For Data from Entries fields, can place another field value from the same entry into a different cell in the table
+* New: Added options to Dynamic Tables - initial number of rows; user sortable; add/delete row labels
 
 = 1.2.1 =
 * Feature: Calculation fields can now place calculations into other fields on the form
