@@ -217,23 +217,25 @@ jQuery(document).ready(function(){
 });
 
 jQuery( function($){
-	$( 'table.frm-table.ui-sortable' ).sortable({
-		axis: 'y',
-		handle: '.frmplus-sort-row',
-		items: 'tbody tr',
-		helper: function(e, tr){
-		    var $originals = tr.children();
-		    var $helper = tr.clone();
-		    $helper.children().each(function(index){
-		      	$(this).width($originals.eq(index).width() + parseInt($originals.eq(index).css('borderLeftWidth')));
-		    });
-		    return $helper;
-		},
-		stop: function(){
-			var id = $(this).attr('id').match( /[0-9]+$/ )[0]
-			adjust_row_numbers( id );
-			$(this).trigger( 'sort_rows', [ id ] );
-		},
-	});
+	if ( $( 'table.frm-table.ui-sortable' ).length ){
+		$( 'table.frm-table.ui-sortable' ).sortable({
+			axis: 'y',
+			handle: '.frmplus-sort-row',
+			items: 'tbody tr',
+			helper: function(e, tr){
+			    var $originals = tr.children();
+			    var $helper = tr.clone();
+			    $helper.children().each(function(index){
+			      	$(this).width($originals.eq(index).width() + parseInt($originals.eq(index).css('borderLeftWidth')));
+			    });
+			    return $helper;
+			},
+			stop: function(){
+				var id = $(this).attr('id').match( /[0-9]+$/ )[0]
+				adjust_row_numbers( id );
+				$(this).trigger( 'sort_rows', [ id ] );
+			},
+		});
+	}
 });
 

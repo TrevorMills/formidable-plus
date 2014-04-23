@@ -60,4 +60,12 @@
 	border: 1px solid #d1e5ee;
 	padding: 15px;
 	background: #fafafa;
+	line-height:3em;
+}
+.dynamic-options label{
+	display:inline-block;
+	width:200px;
+}
+.dynamic-options label.auto_width{
+	width:auto;
 }

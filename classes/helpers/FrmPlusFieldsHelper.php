@@ -664,7 +664,7 @@ class FrmPlusFieldsHelper{
 			$options->starting_rows = intval( $field->starting_rows );
 		}
 		if ( !isset( $field->rows_sortable ) ){
-			$options->rows_sortable = false;
+			$options->rows_sortable = true;
 		}
 		else{
 			$options->rows_sortable = $field->rows_sortable == 'yes';
