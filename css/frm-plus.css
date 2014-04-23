@@ -81,7 +81,7 @@
 }
 .with_frm_style .frm-table textarea.readonly,
 .frm-table textarea.readonly{
-	overflow:scroll;
+	overflow:hidden;
 	resize:none;
 	width:100%;
 }
