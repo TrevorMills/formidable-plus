@@ -4,7 +4,9 @@
 		
 	<?php foreach ($rows as $opt_key => $opt) : ?>
 		<tr class="row-<?php echo $row_num; ?>">
-			<th><?php echo FrmPlusFieldsHelper::parse_option($opt,'name'); ?></th>
+			<?php if ( !isset( $field['hide_row_headers'] ) || !$field['hide_row_headers'] ) : ?>
+				<th><?php echo FrmPlusFieldsHelper::parse_option($opt,'name'); ?></th>
+			<?php endif; ?>
 		<?php if (!count($columns)) $columns[] = ""; // Spoof to get a column up there to enter data into ?>
 		<?php $col_num = 0; foreach ($columns as $col_key => $col_opt) : ?>
 			<td class="column-<?php echo $col_num; ?>"><?php require('table-field.php'); $col_num++; ?></td>

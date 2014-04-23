@@ -23,22 +23,26 @@ if ( !isset( $display_only ) ){
 <table id="frm-table-<?php echo $field['id']; ?>" class="frm-table<?php if (count($classes = apply_filters('frm_table_classes',array(),$field['id']))) echo ' '.join(' ',$classes); ?> <?php if ( $dynamic_options->is_dynamic && $dynamic_options->rows_sortable && $display_only !== true ) : ?>ui-sortable<?php endif; ?>">
 <?php if (count($columns)) : ?>
 	<?php // First Row - Column Headers ?>
-	<thead>
-		<tr>
-		<?php if (count($rows)) : ?>
-			<?php // Blank column header to go above Row headers ?>
-			<th>&nbsp;</th>
-		<?php endif; ?>
-		<?php $col_num = 0; foreach ($columns as $opt_key => $opt) : ?>
-			<th class="column-<?php echo $col_num++; ?>"><?php echo FrmPlusFieldsHelper::parse_option($opt,'name'); ?></th>
-		<?php endforeach; ?>
-		<?php if (!count($rows)) : ?>
-			<?php if ($display_only !== true) : // Blank column header for action buttons (delete row, insert row) ?>
-			<th>&nbsp;</th>
+	<?php if ( !isset( $field['hide_column_headers'] ) || !$field['hide_column_headers'] ) : ?>
+		<thead>
+			<tr>
+			<?php if (count($rows)) : ?>
+				<?php // Blank column header to go above Row headers ?>
+				<?php if ( !isset( $field['hide_row_headers'] ) || !$field['hide_row_headers'] ) : ?>
+					<th>&nbsp;</th>
+				<?php endif; ?>
 			<?php endif; ?>
-		<?php endif; ?>
-		</tr>
-	</thead>
+			<?php $col_num = 0; foreach ($columns as $opt_key => $opt) : ?>
+				<th class="column-<?php echo $col_num++; ?>"><?php echo FrmPlusFieldsHelper::parse_option($opt,'name'); ?></th>
+			<?php endforeach; ?>
+			<?php if (!count($rows)) : ?>
+				<?php if ($display_only !== true) : // Blank column header for action buttons (delete row, insert row) ?>
+				<th>&nbsp;</th>
+				<?php endif; ?>
+			<?php endif; ?>
+			</tr>
+		</thead>
+	<?php endif; ?>
 <?php endif; ?>
 	<tbody>
 <?php require('table-row.php'); ?>

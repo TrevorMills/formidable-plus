@@ -638,6 +638,13 @@ class FrmPlusFieldsHelper{
 			}
 
 		}
+		
+		if ( isset( $atts['hide_row_headers'] ) ){
+			$field['hide_row_headers'] = $atts['hide_row_headers'] == 'true';
+		}
+		if ( isset( $atts['hide_column_headers'] ) ){
+			$field['hide_column_headers'] = $atts['hide_column_headers'] == 'true';
+		}
 			
 		return $field;
 	}
