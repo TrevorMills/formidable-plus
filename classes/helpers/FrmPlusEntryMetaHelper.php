@@ -36,8 +36,33 @@ class FrmPlusEntryMetaHelper{
 			ob_start();
 			require(FRMPLUS_VIEWS_PATH.'/frmplus-fields/table.php');
 			$value = ob_get_clean();
+			
+			if ( $atts['truncate'] ){
+				// As it will be when displaying the table value in the list of entries.
+				// Unfortunately, FrmProEntryMetaHelper clobbers the table view with FrmAppHelper::truncate
+				// We're going to statically save our value and then restore it using the frm_display_value
+				// filter that happens later in the FrmProEntryMetaHelper::display_value function
+				self::frm_display_value_once( $value );
+			}
 			break;
 		}		
+		return $value;
+	}
+	
+	public static function frm_display_value_once( $value, $field = null, $atts = array() ){
+		static $saved_value;
+		if ( empty( $saved_value ) ){
+			// Used as a setter, set the static value and setup the filter
+			$saved_value = $value;
+			add_filter( 'frm_display_value', 'FrmPlusEntryMetaHelper::frm_display_value_once', 10, 3 );
+			return;
+		}
+		else{
+			// As the filter
+			$value = '<div style="width:100%;max-height:150px;overflow:scroll">' . $saved_value . '</div>';
+			$saved_value = null;
+			remove_filter( 'frm_display_value', 'FrmPlusEntryMetaHelper::frm_display_value_once', 10 );
+		}
 		return $value;
 	}
 	

@@ -66,9 +66,12 @@ jQuery( function($){
 				
 		extract( $args );
 		$options = $this->massageOptions( $options );
+		if ( empty( $value ) && !empty( $options['text'] ) ){
+			$value = $options['text'];
+		}
 
 		if ( $options['multiline'] ){
-			echo "<textarea readonly name=\"{$this_field_name}[$col_num]\" id=\"$this_field_id\" class=\"auto_width table-cell readonly\" >" . esc_html( $options['text'] ) . '</textarea>';
+			echo "<textarea readonly name=\"{$this_field_name}[$col_num]\" id=\"$this_field_id\" class=\"auto_width table-cell readonly\" >" . esc_html( $value ) . '</textarea>';
 			echo '
 <script type="text/javascript">
 	jQuery(function($){
@@ -78,7 +81,7 @@ jQuery( function($){
 </script>';
 		}
 		else{
-			echo "<input type=\"text\" readonly name=\"{$this_field_name}[$col_num]\" id=\"$this_field_id\" value=\"" . esc_attr( $options['text'] ) . "\" class=\"auto_width table-cell readonly\"/>";
+			echo "<input type=\"text\" readonly name=\"{$this_field_name}[$col_num]\" id=\"$this_field_id\" value=\"" . esc_attr( $value ) . "\" class=\"auto_width table-cell readonly\"/>";
 		}
 	}	
 	
