@@ -607,14 +607,22 @@ class FrmPlusFieldsHelper{
 			if ( !empty( $field['value'] ) ){
 				if ( $what == 'columns' ){
 					foreach ( $field['value'] as $row_index => $column_cells ){
+						// First off, need to make sure there is a value for every column
+						// otherwise, array_values below will cause this algorithm to drop columns
+						foreach ( array_keys( $columns ) as $col_index => $key ){
+							if ( !isset( $column_cells[ $col_index ] ) ){
+								$column_cells[ $col_index ] = false;
+							}
+						}
+						ksort( $column_cells );
 						foreach ( $column_cells as $col_index => $cell_value ){
 							if ( !in_array( $col_index, $include ) ){
-								unset( $field['value'][$row_index][$col_index] );
+								unset( $column_cells[$col_index] );
 							}
 						}
 						// reindex the column cells 
 						// this is the line that will really screw things up if not in a display_only context
-						$field['value'][$row_index] = array_values( $field['value'][$row_index] );
+						$field['value'][$row_index] = array_filter( array_values( $column_cells ) );
 					}
 				}
 				elseif ( !empty( $include ) ){
