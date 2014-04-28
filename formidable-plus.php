@@ -5,7 +5,7 @@
 /*
 Plugin Name: Formidable Plus
 Description: Adds a table field-type
-Version: 1.2.2
+Version: 1.2.3
 Plugin URI: http://topquark.com/extend/plugins/formidable-plus
 Author URI: http://topquark.com
 Author: topquarky

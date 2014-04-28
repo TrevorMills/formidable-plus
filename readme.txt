@@ -3,7 +3,7 @@ Contributors: topquarky
 Tags: formidable, forms, table, new field-type
 Requires at least: 2.5 ( Formidable Pro 1.07.04 or higher is required )
 Tested up to: 3.8.2
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 
 This plugin adds a new field type to the Formidable Pro plugin.  It allows you to add a table to your form.
 
@@ -155,6 +155,11 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 
 
 == Changelog ==
+
+= 1.2.3 = 
+* New: For Data from Entries fields, can place multiple values from same entry into other cells in the table
+* Fix: Issue with displaying entries with empty columns
+* Fix: Bug with Statics that prevented saved value from prepopulating form when editting entry
 
 = 1.2.2 = 
 * New: calculation fields can have a prefix (like $) or suffix
