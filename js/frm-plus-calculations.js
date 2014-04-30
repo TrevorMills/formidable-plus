@@ -233,7 +233,7 @@ jQuery( function($){
 							return $(this).parentsUntil( 'table', '.' + settings[ me.getOpposite( key ) + 's' ].join( ', .' ) ).length > 0;
 						}))
 					, settings )
-				);
+				).trigger( 'change' );
 			});
 		},
 		
