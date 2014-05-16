@@ -37,7 +37,7 @@ class FrmPlusEntryMetaHelper{
 			require(FRMPLUS_VIEWS_PATH.'/frmplus-fields/table.php');
 			$value = ob_get_clean();
 			
-			if ( $atts['truncate'] ){
+			if ( isset( $atts['truncate'] ) && $atts['truncate'] ){
 				// As it will be when displaying the table value in the list of entries.
 				// Unfortunately, FrmProEntryMetaHelper clobbers the table view with FrmAppHelper::truncate
 				// We're going to statically save our value and then restore it using the frm_display_value
