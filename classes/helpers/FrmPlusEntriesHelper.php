@@ -69,6 +69,17 @@ class FrmPlusEntriesHelper{
 		}
 		return $return;
 	}
+	
+	public static function getCurrentEntryId(){
+		// have 'entry_id' take precedence over 'id' as both are set when doing frm_entries_edit_entry_ajax
+		$entry_id = FrmAppHelper::get_param('entry_id') ? FrmAppHelper::get_param('entry_id') : FrmAppHelper::get_param('id');
+		if ( $entry_id ){
+			return $entry_id;
+		}
+		else{
+			return false;
+		}
+	}
 		
 }
 ?>
