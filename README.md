@@ -156,6 +156,11 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 
 ## Changelog ##
 
+### 1.2.4 ###
+* Fix: Trigger change on "other" fields that we fill in with FrmPlus calculations
+* Fix: A couple of stray notices for non-initialized variables
+* Fix: Empty table when doing frm_entries_edit_entry_ajax
+
 ### 1.2.3 ###
 * New: For Data from Entries fields, can place multiple values from same entry into other cells in the table
 * Fix: Issue with displaying entries with empty columns
