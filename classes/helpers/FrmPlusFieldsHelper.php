@@ -566,7 +566,7 @@ class FrmPlusFieldsHelper{
 			else{
 				// include all, exclude thos mentioned
 				$include = array_keys( $$what );
-				$exclude = array_map( 'trim', explode( ',', $atts[ "exclude_$what" ] ) );
+				$exclude = isset( $atts[ "exclude_$what" ] ) ? array_map( 'trim', explode( ',', $atts[ "exclude_$what" ] ) ) : array();
 			}
 			
 			foreach ( array( 'include', 'exclude' ) as $clude ){
