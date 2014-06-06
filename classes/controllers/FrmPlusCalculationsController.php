@@ -128,7 +128,9 @@ class FrmPlusCalculationsController{
 				</div>
 				<div class="select_<?php echo $what; ?>" <?php if ( $options[ "all_{$what}" ] ) : ?>style="display:none"<?php endif; ?>>
 					<?php printf( __( 'Which %s should be included?', FRMPLUS_PLUGIN_NAME ), __( $what, FRMPLUS_PLUGIN_NAME ) ); ?>
-					<?php foreach ( $$what as $target => $opt ) : $label = FrmPlusFieldsHelper::parse_option( $opt, 'name' ); if ( substr( $what, 0, 3 ) == substr( $is_a, 0, 3 ) && FrmPlusFieldsHelper::parse_option( $opt, 'type' ) == 'calculation' ) continue; ?>
+					<?php foreach ( $$what as $target => $opt ) : $label = FrmPlusFieldsHelper::parse_option( $opt, 'name' ); 
+						if ( $target == $opt_key ) continue;
+						if ( false && substr( $what, 0, 3 ) == substr( $is_a, 0, 3 ) && FrmPlusFieldsHelper::parse_option( $opt, 'type' ) == 'calculation' ) continue; ?>
 						<div>
 							<label><input type="checkbox" name="frmplus_options[<?php echo $what; ?>][]" value="<?php echo $target; ?>" <?php checked( true, !isset( $options[$what] ) || in_array( $target, $options[$what] ) ); ?>> <?php echo $label; ?></label>
 						</div>

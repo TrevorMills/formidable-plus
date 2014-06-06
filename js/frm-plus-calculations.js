@@ -140,7 +140,7 @@ jQuery( function($){
 			var field_id = e.data.field_id,
 				table_selector = me.getTableSelector( field_id ),
 				classes = $(this).attr( 'class' ).match( /(row|column)-[0-9]+/ ),
-				inputs = $( table_selector + '.' + classes[0] + ' :input' ).not( '.calculation' );
+				inputs = $( table_selector + '.' + classes[0] + ' :input' ); //.not( '.calculation' );
 				
 			$.each( me.calculators[ field_id ][ classes[0] ], function( key, settings ){
 				var target = table_selector;
