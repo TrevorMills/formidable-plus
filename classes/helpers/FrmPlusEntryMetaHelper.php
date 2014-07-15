@@ -162,16 +162,32 @@ class FrmPlusEntryMetaHelper{
 		}
 		else{
 			// The new way
-			static $entries;
+			static $entries,$fields;
 			if (!isset($entries)){
 				$entries = array();
+			}
+			if (!isset($fields)){
+				$fields = array();
 			}
 			if (!array_key_exists($entry_id,$entries)){
 				global $frm_entry;
 				$entries[$entry_id] = $frm_entry->getOne($entry_id,true);
 			}
+			if (!array_key_exists($field_id,$fields)){
+				global $frm_field;
+				$fields[$field_id] = $frm_field->getOne($field_id);
+			}
 			$entry = $entries[$entry_id];
-			if ( !$entry || !isset( $entry->metas[$field_id] ) ){
+			$field = $fields[$field_id];
+			if ( !$entry ){
+				return null;
+			}
+			
+			// This is for the case where the table field is stored as a custom field for a created post
+			if ( !isset( $entry->metas[$field_id] ) && $entry->post_id && $field->field_options['post_field'] ){
+				$entry->metas[$field_id] = FrmProEntryMetaHelper::get_post_value( $entry->post_id, $field->field_options['post_field'], $field->field_options['custom_field'], array() );
+			}
+			if ( !isset( $entry->metas[$field_id] ) ){
 				return null;
 			}
 			$value = maybe_unserialize($entry->metas[$field_id]);
@@ -372,7 +388,6 @@ class FrmPlusEntryMetaHelper{
 		if (!isset($_POST['form_id']) or !isset($_POST['item_meta']) or !is_numeric($_POST['form_id'])){
 			return;
 		}
-		
 		// We're going to get all table fields in the currently posted form. 
 		// We can then spoof a row into those table fields so that the piece in 
 		// FrmEntry::validate that clobbers single row arrays doesn't trigger
@@ -407,7 +422,16 @@ class FrmPlusEntryMetaHelper{
 				unset($_POST['item_meta'][$field_id]['spoof']);
 			}
 		}
-		
+
+		// If there are values being saved as custom post meta, then we need to remove the 'spoof' from the $_POST['frm_wp_post_custom'] member too
+		if ( isset( $_POST['frm_wp_post_custom'] ) ){
+			foreach ( $_POST['frm_wp_post_custom'] as $key => $value ){
+				list( $field_id, $field_key ) = explode( '=', $key );
+				if ( in_array( $field_id, $spoofed_field_ids ) && isset( $value['spoof'] ) ){
+					unset( $_POST['frm_wp_post_custom'][$key][ 'spoof' ] );
+				}
+			}
+		}
 		return $errors;
 	}
 	
