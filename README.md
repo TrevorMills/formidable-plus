@@ -3,7 +3,7 @@
 **Tags:** formidable, forms, table, new field-type  
 **Requires at least:** 2.5 ( Formidable Pro 1.07.04 or higher is required )  
 **Tested up to:** 3.8.2  
-**Stable tag:** 1.2.3
+**Stable tag:** 1.2.5
 
 This plugin adds a new field type to the Formidable Pro plugin.  It allows you to add a table to your form.
 
@@ -29,7 +29,7 @@ You can have any number of rows and any number of columns.  You can even create 
 
 Recent releases of Formidable Pro have caused headaches with Formidable Plus - breaking things in unexpected places.  Because of this, I am unable to continually test F+ against all previous versions of FPro.  I am only able to support the current version of Formidable Pro.  Odds are good that it will work in previous versions, but I need to focus my development time on the current version.
 
-*Current version of Formidable Pro supported: 1.07.06.*
+*Current version of Formidable Pro supported: 1.07.09.*
 
 ### What kinds of fields can I include in a Formidable Plus table? ###
 When you add a table field to your form, the edit widget gives you a dropdown box for each row and column.  The dropdown box contains the available field types.  Currently, these are:
@@ -156,6 +156,10 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 
 ## Changelog ##
 
+### 1.2.5 ###
+* Fix: fixing issues where table values that got stored as custom post meta were not showing up, and sometimes causing ksort error
+* Change: allow calculation fields to be used in other calculations
+
 ### 1.2.4 ###
 * Fix: Trigger change on "other" fields that we fill in with FrmPlus calculations
 * Fix: A couple of stray notices for non-initialized variables
@@ -187,114 +191,4 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 * Feature: Select fields can now be marked as multiselect, which allows users to choose more than one value from the list
 * Feature: Select fields can now be marked as autocomplete, which changes the field in the table to be one where users can type and be presented with a list of available options
 * Fix: removed more lingering non-fatal PHP notices
-
-### 1.1.16 ###
-* Fix: dealt with lingering non-fatal PHP notices
-* Fix: certain conditions that led to rendering of a large form taking forever (unnecessary parsing through replace_shortcodes)
-
-### 1.1.15 ###
-* Fix: update to Formidable Pro caused multipage forms to show serialized data in table fields.  
-
-### 1.1.14 ###
-* Fix: admin area can now add/delete columns & rows again. 
-
-### 1.1.13 ###
-* Fix: If excluding a table field in the formidable shortcode by using the fields= attribute, the values for table fields are now propagated properly
-* Change: how use-tooltips and use-arrow-keys works.  This work removed the deprecated/removed function jQuery.live from the Formidable Plus scripts
-
-### 1.1.12 ###
-* Fix: Table columns & rows in admin page were not sortable anymore with Formidable 1.07.0.  Now they are.
-
-### 1.1.11 ###
-* Fix: Issue if multi-page form had HTML field containing a shortcode for a table field from earlier in the form
-
-### 1.1.10 ###
-* Fix: Issues with Formidable Pro 1.06.09 and 1.06.10. 
-* New: Exporting table data now works, with options.  See the FAQ.
-
-### 1.1.8.4 ###
-* Fix: PHP error if a table field is conditionally hidden on submit.
-
-### 1.1.8.3 ###
-* Fix: [default-message] in the email notifications was not rendering the table.  
-
-### 1.1.8.2 ###
-* Fix: a bug which affected data submitted on a dynamic table containing selects or checkboxes when the user has deleted a row before submitting.
-
-### 1.1.8.1 ###
-* Fix: a problem that could occur if a table field is required.  The bug caused a warning message to be output to the browser.
-
-### 1.1.8 ###
-* Fix: a critical bug where a table field with only one row was getting saved improperly to the database, thanks to something new in FrmEntry::validate.  
-
-### 1.1.7.2 ###
-* Fix: a new issue editing entries with table fields. (thanks Rob Slowen)
-* Fix: slashes being added when adding a new row via javascript (thanks @lenmason)
-
-### 1.1.7.1 ###
-* Fix: further addressed the compatibility problem fixed in 1.1.7 for a case that popped up (thanks bebetsy.com)
-
-### 1.1.7 ###
-* *Critical Update* - fixed a compatibility problem with the latest version of Formidable Pro that caused data loss when editting entries with table fields
-
-### 1.1.6.3rfc ###
-* Fix: simple checkboxes now save the correct value (thanks Jason Hill for bringing the problem to my attention)
-
-### 1.1.6.2rfc ###
-* Fix: mutlibyte characters in textareas now properly encoded
-* Added: on a dynamic table, when a row is added or deleted, the event 'add_row' or 'delete_row' is triggered on the table.  See `js/frm_plus.js` for details
-* Deprecated: the post_add_row and post_delete_row methods, in favour of the event mechanism just added
-* Added: a filter on the "Add Row" (frmplus-text-add-row) and "Delete Row" (frmplus-text-delete-row) text, to allow you to change those labels.  
-* Added: an ajax indicator when you click Add Row
-
-### 1.1.6.1rfc ###
-* Fix: bug where td and tr elements weren't getting col-n and row-n classes.  (thanks JoeErsinghaus)
-* Fix: unnecessary session() code removed from Entries Controller. (thanks glyphicwebdesign.com)
-
-### 1.1.6 ###
-* Critical fix: a bug that could have resulted in lost data when reordering columns on a table field a multipage form.  
-
-### 1.1.5 ###
-* Fix: a bug that prevented adding columns to a table field. A PHP error was being thrown trying to use a string as an array.
-* Change: the main javascript file, frm_plus.js, is now plain javascript, as opposed to js.php.  This is because some installations of WordPress do not allow loading of .php files as scripts. They return a 404.  
-
-### 1.1.4 ###
-* Fixed: a table field on an earlier page in a multi-page form now gets saved properly (requires Formidable Pro 1.6.x - yet to be released).  If you're needing to use this on a multi-page form on Formidable 1.5.x, please contact support@topquark.com to obtain a formidable patch.  
-* Added: a column-{n} class to each <td> element in the table.  Should allow better CSS control over individual columns
-
-### 1.1.3 ###
-* Emailed form results now properly display table field types.  (Note: looks like crap if you choose to send Plain Text)
-
-### 1.1.2 ###
-* Fixed a warning thrown on non-administrator profile page
-
-### 1.1.1 ###
-* Updated Top Quark credentials to work on multisite
-
-### 1.1.0 ###
-* Added new field types, allowing table to have checkboxes, radio buttons & dropdowns
-
-### 1.0.4 ###
-* Changed the settings page to access the proper 'formidable-plus' settings page, instead of the generic 'plugin' settings page
-* Used new hook in Formidable Pro 1.05.04 for Custom Displays.  The `[frm_table_display]` shortcode from Plus version 1.0.3 is now deprecated
-
-### 1.0.3 ###
-* Added a shortcode for custom displays - `[frm_table_display id=N]` (where N is the field ID).  Works around the "Array,Array" problem when inserting a table field into a custom display
-
-### 1.0.2 ###
-* Added TopQuark.com authentication
-
-### 1.0.1 ###
-* Initial check-in
-
-## Upgrade Notice ##
-
-### 1.0.4 ###
-You will have to re-enter your TopQuark credentials on the Settings > Formidable Plus page.
-
-### 1.0.2 ###
-You will only be able to upgrade to this version after purchasing the plugin from [TopQuark.com](http://topquark.com/extend/plugins/formidable-plus)
-
-### 1.0.1 ###
-No upgrade notice
 
