@@ -1,3 +1,8 @@
+// Array indexOf Polyfill
+if(!Array.prototype.indexOf){Array.prototype.indexOf=function(e,t){var n;if(this==null){throw new TypeError('"this" is null or not defined')}var r=Object(this);var i=r.length>>>0;if(i===0){return-1}var s=+t||0;if(Math.abs(s)===Infinity){s=0}if(s>=i){return-1}n=Math.max(s>=0?s:i-Math.abs(s),0);while(n<i){var o;if(n in r&&r[n]===e){return n}n++}return-1}}
+// String trim Polyfill
+if(!String.prototype.trim){(function(){var e=/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;String.prototype.trim=function(){return this.replace(e,"")}})()}
+
 jQuery( function($){
 	var me = FRM_PLUS_CALCULATIONS;
 	
@@ -45,8 +50,11 @@ jQuery( function($){
 
 				// Sanitize Settings
 				$.each( fields, function( key, settings ){					
-					if ( typeof settings.function == 'undefined' ){
-						settings.function = 'sum'; // default to "Sum"
+
+					if ( typeof settings['function'] == 'undefined' ){
+
+
+						settings['function'] = 'sum'; // default to "Sum"
 					}		
 					if ( settings.rows == 'tr' ){
 						// It's a dynamic table set it up to contain the rows in the actual table
@@ -104,7 +112,7 @@ jQuery( function($){
 							selectors.push( '.' + selector );
 						}
 						
-						if ( typeof me.calculators[ field_id ][ key ] != 'undefined' && typeof me.calculators[ field_id ][ key ][ selector ] != 'undefined' && me.calculators[ field_id ][ key ][ selector ][ 'function' ] == settings.function ){
+						if ( typeof me.calculators[ field_id ][ key ] != 'undefined' && typeof me.calculators[ field_id ][ key ][ selector ] != 'undefined' && me.calculators[ field_id ][ key ][ selector ][ 'function' ] == settings['function'] ){
 							// This is a case where a calculated column intersects with a calculated row.  We can handle that.  
 							me.special_calculators[ field_id ].push( me.getOpposite( selector ) == 'column' ? { row: selector, column: key } : { row: key, column: selector } ); 
 						}
@@ -156,7 +164,7 @@ jQuery( function($){
 						// this next line may look a little confusing, but it's just a compact way of calling a function
 						// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
 						// the value of settings.include_empty )
-						me[ settings.function ]( inputs.filter( function(){
+						me[ settings['function']]( inputs.filter( function(){
 							if ( !settings.include_empty && $(this).val() == '' ){
 								// easy
 								return false;
@@ -186,7 +194,7 @@ jQuery( function($){
 						// this next line may look a little confusing, but it's just a compact way of calling a function
 						// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
 						// the value of settings.include_empty )
-						me[ settings.function ]( inputs.filter( function(){
+						me[ settings['function'] ]( inputs.filter( function(){
 							if ( !settings.include_empty && $(this).val() == '' ){
 								// easy
 								return false;
@@ -224,7 +232,7 @@ jQuery( function($){
 						// this next line may look a little confusing, but it's just a compact way of calling a function
 						// ( i.e. me.add() ) with either all of the inputs, or just the non-empty inputs ( depending on 
 						// the value of settings.include_empty )
-						me[ settings.other.function ]( inputs.filter( function(){
+						me[ settings.other['function']]( inputs.filter( function(){
 							if ( !settings.include_empty && $(this).val() == '' ){
 								// easy
 								return false;
