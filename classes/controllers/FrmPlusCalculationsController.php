@@ -12,7 +12,6 @@ class FrmPlusCalculationsController{
 
 	public function __construct(){
 		add_action( 'frmplus_register_types', array( &$this, 'register_type' ) );
-		$this->available_calculations = apply_filters( 'frmplus_available_calculations', $this->available_calculations );
 	}
 	
 	function register_type(){
@@ -86,7 +85,7 @@ class FrmPlusCalculationsController{
 		<div class="section">
 			<label><?php _e( 'Function', FRMPLUS_PLUGIN_NAME ); ?>:</label>
 			<select name="frmplus_options[function]">
-				<?php foreach ( $this->available_calculations as $option ) : ?>
+				<?php foreach ( apply_filters( 'frmplus_available_calculations', $this->available_calculations ) as $option ) : ?>
 					<option value="<?php echo $option; ?>" <?php selected( $option, $options['function'] ); ?>><?php echo __( ucwords( $option ), FRMPLUS_PLUGIN_NAME ); ?></option>
 				<?php endforeach; ?>
 			</select>
