@@ -171,7 +171,12 @@ jQuery(function($){
 			$this->enqueued = true;
 		    wp_enqueue_script('jquery-ui-datepicker');
 		    wp_enqueue_style('jquery-theme');
-		    add_action( 'wp_footer', array( &$this, 'particulars' ) );
+			if ( is_admin() && !defined( 'DOING_AJAX' ) ){
+			    add_action( 'admin_footer', array( &$this, 'particulars' ) );
+			}
+			else{
+			    add_action( 'wp_footer', array( &$this, 'particulars' ) );
+			}
 		}
 		
 		extract( $args );
