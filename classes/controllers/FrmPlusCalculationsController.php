@@ -197,9 +197,11 @@ class FrmPlusCalculationsController{
 	
 	public function prepareForLocalization( $particulars ){
 		global $frm_field;
+		//echo '<pre>' . print_r( $particulars, true ) . '</pre>';
 		foreach ( $particulars as $field_id => $table_fields ){
 			$field = $frm_field->getOne( $field_id );
 			list( $columns, $rows ) = FrmPlusFieldsHelper::get_table_options( maybe_unserialize($field->options) );
+			//echo '<pre>' . print_r( $rows, true ) . '</pre>';
 			foreach ( $table_fields as $key => $settings ){
 				foreach ( array( 'rows', 'columns' ) as $what ){
 					if ( $settings[ "all_$what" ] ){
@@ -210,7 +212,12 @@ class FrmPlusCalculationsController{
 					}
 					foreach ( $settings[ $what ] as $index => $target ){
 						$settings[ $what ][ $index ] = substr( $target, 0, 3 ) == 'row' ? 'row-' . array_search( $target, array_keys( $rows ) ) : 'column-' . array_search( $target, array_keys( $columns ) );
+						if ( $settings[ $what ][ $index ] == $key ) {
+							// Do not include the $what itself, it leads to exponential growth :)
+							unset( $settings[ $what ][ $index ] );
+						}
 					}
+					$settings[ $what ] = array_values( $settings[ $what ] );
 					unset( $settings[ "all_$what" ] ); // not needed anymore
 				}
 				// @debug

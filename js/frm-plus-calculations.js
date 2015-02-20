@@ -176,6 +176,19 @@ jQuery( function($){
 				);
 			});
 			
+			// Radiolines are a little tricky.  Changing a radio button in one cell affects the selected values of other cells.  
+			// This little snippet checks to see if the cell we're processing contains just one radio button.  If it does, then we'll
+			// call it a radioline and trigger 'change' on all associated buttons (with the same name).  The doing_radioline piece is so that 
+			// when we trigger change on another radio button, it doesn't in turn trigger changes on the group again.
+			var radioline_test = $(this).find('input[type="radio"]');
+			if ( radioline_test.length == 1 && !me.doing_radioline ) {
+				me.doing_radioline = true;
+				$( table_selector ).find( 'input[name="' + radioline_test.attr('name') + '"]' ).not( radioline_test ).each( function(){
+					$(this).trigger( 'change' );
+				});
+				me.doing_radioline = false;
+			}
+						
 			$.each( me.special_calculators[ field_id ], function( index, calculator ){
 				var settings, target = table_selector + '.' + calculator.row + ' .' + calculator.column + ' input.calculation';
 
@@ -342,7 +355,12 @@ jQuery( function($){
 		sum: function( inputs ){
 			var sum = 0, error = false;
 			inputs.each( function(){
-				var value = me.parseNum( $(this).val() );
+				var value;
+				if ( ( $(this).is( 'input[type="radio"]' ) || $(this).is( 'input[type="checkbox"]' ) ) && !$(this).is( ':checked' ) ) {
+					value = 0;
+				} else {
+					value = me.parseNum( $(this).val() );
+				};
 				if ( value === false )
 					error = true;
 				else
