@@ -37,10 +37,6 @@ class FrmPlusFieldsHelper{
 			'type' => 'radio',
 			'has_options' => true
 		));
-		self::register_type( array(
-			'type' => 'radioline',
-			'needs_massaging' => true
-		));
 
 		do_action( 'frmplus_register_types' );
 	}

@@ -62,6 +62,7 @@ require_once(FRMPLUS_CONTROLLERS_PATH . "/FrmPlusCalculationsController.php");
 require_once(FRMPLUS_CONTROLLERS_PATH . "/FrmPlusDataFromEntriesController.php");
 require_once(FRMPLUS_CONTROLLERS_PATH . "/FrmPlusIncrementerController.php");
 require_once(FRMPLUS_CONTROLLERS_PATH . "/FrmPlusStaticController.php");
+require_once(FRMPLUS_CONTROLLERS_PATH . "/FrmPlusRadioLineController.php");
 
 global $frmplus_app_controller;
 global $frmplus_fields_controller;

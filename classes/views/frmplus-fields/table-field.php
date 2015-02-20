@@ -54,79 +54,64 @@ else {
 	$this_field_id = "field_{$field['field_key']}_{$row_num}_{$col_num}";
 	$this_field_name = sprintf( '%s[%s]', $field_name, $row_num );
 	
-	switch($type){ 
-	case 'textarea':
-		echo '<textarea id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" class="auto_width table-cell">'.htmlspecialchars($value).'</textarea>'."\n";
-		break;
-	case 'radio':
-		if (count($options['options'])){
-			foreach($options['options'] as $option_num => $option){
-				echo '<label for="'.$this_field_id.'_'.$option_num.'"><input type="radio" class="radio table-cell id-has-option" id="'.$this_field_id.'_'.$option_num.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr($option).'" '.checked($value,$option,false).' /> '.$option.'</label>'."\n";
+	if ( has_action( 'frmplus_field_input_' . $type  ) ){
+		do_action( 'frmplus_field_input_' . $type, compact( 'field', 'name', 'value', 'options', 'row_num', 'col_num', 'this_field_id', 'this_field_name', 'precedence', 'entry_id' ) );
+	} else {
+		switch($type){ 
+		case 'textarea':
+			echo '<textarea id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" class="auto_width table-cell">'.htmlspecialchars($value).'</textarea>'."\n";
+			break;
+		case 'radio':
+			if (count($options['options'])){
+				foreach($options['options'] as $option_num => $option){
+					echo '<label for="'.$this_field_id.'_'.$option_num.'"><input type="radio" class="radio table-cell id-has-option" id="'.$this_field_id.'_'.$option_num.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr($option).'" '.checked($value,$option,false).' /> '.$option.'</label>'."\n";
+				}
 			}
-		}
-		else{
-			echo '<input type="radio" class="radio table-cell" id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr(FrmPlusFieldsHelper::get_simple_on_value()).'" '.checked($value,FrmPlusFieldsHelper::get_simple_on_value(),false).' />'."\n";
-		}
-		break;
-	case 'radioline':
-		switch ($precedence){
-		case 'row':
-			// This is a row of radio buttons, grouped together (so selecting one column deselects all others)
-			$option_value = $col_num;
-			echo '<input type="radio" class="radio table-cell" id="'.$this_field_id.'" name="'.$this_field_name.'" value="'.esc_attr($option_value).'" '.checked($value,FrmPlusFieldsHelper::get_simple_on_value(),false).' />'."\n";
+			else{
+				echo '<input type="radio" class="radio table-cell" id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr(FrmPlusFieldsHelper::get_simple_on_value()).'" '.checked($value,FrmPlusFieldsHelper::get_simple_on_value(),false).' />'."\n";
+			}
 			break;
-		case 'column':
-			// This is a column of radio buttons, grouped together (so selecting one row deselects all others)
-			$option_value = $row_num;
-			echo '<input type="radio" class="radio radioline-transpose" id="'.$this_field_id.'" name="'.$field_name.'[transpose]['.$col_num.']" value="'.esc_attr($option_value).'" '.checked($value,FrmPlusFieldsHelper::get_simple_on_value(),false).' />'."\n";
-			break;
-		}
-		break;
-	case 'select':
-		if ( isset( $options['multiselect'] ) && $options['multiselect'] )
-			$multiple = 'multiple data-placeholder=" "';
-		else
-			$multiple = '';
+		case 'select':
+			if ( isset( $options['multiselect'] ) && $options['multiselect'] )
+				$multiple = 'multiple data-placeholder=" "';
+			else
+				$multiple = '';
 		
-		if ( is_admin() && !defined( 'DOING_AJAX' ) ){
-			$options['autocom'] = false;
-		}
-		if ( isset( $options['autocom'] ) && $options['autocom'] ){
-	        global $frm_vars;
-	        $frm_vars['chosen_loaded'] = true;
-			$frm_chzn = 'frm_chzn';
-		}
-		else{
-			$options['autocom'] = false;
-			$frm_chzn = '';
-		}
-		echo "<select id=\"$this_field_id\" $multiple name=\"{$this_field_name}[$col_num]" . ( $multiple ? '[]' : '' ) . "\" class=\"table-cell $frm_chzn\">\n";
-		if ( !$multiple ){
-			echo '<option value="" '.selected($value,'',false).'>&nbsp;</option>'."\n";
-		}
-		foreach ($options['options'] as $option){
-			echo '<option value="'.esc_attr($option).'" '.selected( true, is_array( $value ) ? in_array( $option, $value ) : $value == $option,false).'>'.$option.'</option>'."\n";
-		}
-		echo '</select>'."\n";
-		break;
-	case 'checkbox':
-		if (count($options['options'])){
-			foreach ($options['options'] as $option_num => $option){
-				echo '<label for="'.$this_field_id.'_'.$option_num.'"><input type="checkbox" id="'.$this_field_id.'_'.$option_num.'" name="'.$this_field_name.'['.$col_num.'][]" class="checkbox table-cell id-has-option" value="'.esc_attr($option).'" '.checked(in_array($option,(array)$value),true,false).' /> '.$option.'</label>'."\n";
+			if ( is_admin() && !defined( 'DOING_AJAX' ) ){
+				$options['autocom'] = false;
 			}
-		}
-		else{
-			echo '<input type="checkbox" class="checkbox table-cell" id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr(FrmPlusFieldsHelper::get_simple_on_value()).'" '.checked($value,FrmPlusFieldsHelper::get_simple_on_value(),false).' />'."\n";
-		}
-		break;
-	default:
-		if ( has_action( 'frmplus_field_input_' . $type  ) ){
-			do_action( 'frmplus_field_input_' . $type, compact( 'field', 'name', 'value', 'options', 'row_num', 'col_num', 'this_field_id', 'this_field_name', 'precedence', 'entry_id' ) );
-		}
-		else{
+			if ( isset( $options['autocom'] ) && $options['autocom'] ){
+		        global $frm_vars;
+		        $frm_vars['chosen_loaded'] = true;
+				$frm_chzn = 'frm_chzn';
+			}
+			else{
+				$options['autocom'] = false;
+				$frm_chzn = '';
+			}
+			echo "<select id=\"$this_field_id\" $multiple name=\"{$this_field_name}[$col_num]" . ( $multiple ? '[]' : '' ) . "\" class=\"table-cell $frm_chzn\">\n";
+			if ( !$multiple ){
+				echo '<option value="" '.selected($value,'',false).'>&nbsp;</option>'."\n";
+			}
+			foreach ($options['options'] as $option){
+				echo '<option value="'.esc_attr($option).'" '.selected( true, is_array( $value ) ? in_array( $option, $value ) : $value == $option,false).'>'.$option.'</option>'."\n";
+			}
+			echo '</select>'."\n";
+			break;
+		case 'checkbox':
+			if (count($options['options'])){
+				foreach ($options['options'] as $option_num => $option){
+					echo '<label for="'.$this_field_id.'_'.$option_num.'"><input type="checkbox" id="'.$this_field_id.'_'.$option_num.'" name="'.$this_field_name.'['.$col_num.'][]" class="checkbox table-cell id-has-option" value="'.esc_attr($option).'" '.checked(in_array($option,(array)$value),true,false).' /> '.$option.'</label>'."\n";
+				}
+			}
+			else{
+				echo '<input type="checkbox" class="checkbox table-cell" id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr(FrmPlusFieldsHelper::get_simple_on_value()).'" '.checked($value,FrmPlusFieldsHelper::get_simple_on_value(),false).' />'."\n";
+			}
+			break;
+		default:
 			echo '<input type="text" size="10" id="'.$this_field_id.'" name="'.$this_field_name.'['.$col_num.']" value="'.esc_attr($value).'" class="auto_width table-cell" />'."\n";
+			break;
 		}
-		break;
 	}
 	
 	// Massaging might need to happen.  Let's see if we need to book a massage
