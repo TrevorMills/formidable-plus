@@ -198,10 +198,16 @@ jQuery(function($){
 jQuery(function($){
 	<?php foreach ( $this->particulars as $field_id => $instances ) : ?>
 		<?php foreach ( $instances as $key => $options ) : ?>
+			console.log( $('#frm-table-<?php echo "$field_id"; ?>') );
 			$( '#frm-table-<?php echo "$field_id .$key"; ?> input' ).datepicker(<?php echo json_encode( $options ); ?>);
-			$( '#frm-table-<?php echo "$field_id"; ?>' ).on('add_row',function( event, field_id, tr ){
-				tr.find( '.<?php echo $key; ?> input' ).datepicker(<?php echo json_encode( $options ); ?>);
-			});
+			$( '#frm-table-<?php echo "$field_id"; ?>' )
+				.on('add_row',function( event, field_id, tr ){
+					tr.find( '.<?php echo $key; ?> input' ).datepicker(<?php echo json_encode( $options ); ?>);
+				})
+				.on('sort_rows',function( event, field_id ){
+					$('#frm-table-'+field_id).find( '.<?php echo $key; ?> input' ).datepicker('destroy').datepicker(<?php echo json_encode( $options ); ?>);
+				})
+			;
 		<?php endforeach; ?>
 	<?php endforeach; ?>
 });
