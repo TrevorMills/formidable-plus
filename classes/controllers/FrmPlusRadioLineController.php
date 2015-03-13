@@ -16,7 +16,7 @@ class FrmPlusRadioLineController{
 	
 	public function massageOptions( $options ){
 		if ( !isset( $options['value'] ) ){
-			$options['value'] = 'header';
+			$options['value'] = 'incrementer';
 		}
 		if ( !isset( $options['starting_value'] ) ){
 			$options['starting_value'] = 1;
@@ -71,25 +71,28 @@ jQuery( function($){
 			// This is a row of radio buttons, grouped together (so selecting one column deselects all others)
 			switch( $options['value'] ) {
 			case 'header':
-				$option_value = $field['options']['col_' . ( $col_num + 1 ) ]['name'];
+				$column = $field['options']['col_' . ( $col_num + 1 ) ];
+				$option_value = is_array( $column ) ? $column['name'] : $column;
 				break;
 			case 'incrementer':
 				$option_value = $options['starting_value'] + ( $col_num * $options['increment'] );
 				break;
 			}
-			echo '<input type="radio" class="radio table-cell" id="'.$this_field_id.'" name="'.$this_field_name.'" value="'.esc_attr($option_value).'" '.checked($value,FrmPlusFieldsHelper::get_simple_on_value(),false).' />'."\n";
+			echo '<input type="radio" class="radio table-cell" id="'.$this_field_id.'" name="'.$this_field_name.'" value="'.esc_attr($option_value).'" '.checked(true,in_array($value,array($option_value,FrmPlusFieldsHelper::get_simple_on_value())),false).' />'."\n";
 			break;
 		case 'column':
+			$field_name = preg_replace( '/\[[0-9]+\]$/', '', $this_field_name );
 			// This is a column of radio buttons, grouped together (so selecting one row deselects all others)
 			switch( $options['value'] ) {
 			case 'header':
-				$option_value = $field['options']['row_' . ( $row_num + 1 ) ]['name'];
+				$row = $field['options']['row_' . ( $row_num + 1 ) ];
+				$option_value = is_array( $row ) ? $row['name'] : $row;
 				break;
 			case 'incrementer':
 				$option_value = $options['starting_value'] + ( $row_num * $options['increment'] );
 				break;
 			}
-			echo '<input type="radio" class="radio radioline-transpose" id="'.$this_field_id.'" name="'.$field_name.'[transpose]['.$col_num.']" value="'.esc_attr($option_value).'" '.checked($value,FrmPlusFieldsHelper::get_simple_on_value(),false).' />'."\n";
+			echo '<input type="radio" class="radio radioline-transpose" id="'.$this_field_id.'" name="'.$field_name.'[transpose]['.$col_num.']" value="'.esc_attr($option_value).'" '.checked(true,in_array($value,array($option_value,FrmPlusFieldsHelper::get_simple_on_value())),false).' />'."\n";
 			break;
 		}
 	}	

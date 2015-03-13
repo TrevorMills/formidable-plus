@@ -480,30 +480,60 @@ class FrmPlusFieldsHelper{
 	}
 	
 	function perform_massage($atts){
+		global $frm_field;
 		if (isset($_POST['frmplus_massage_fields'])){
 			foreach ($_POST['frmplus_massage_fields'] as $field_id => $bookings){
+				$field = $frm_field->getOne($field_id);
 				foreach ($bookings as $booking){
 					list($type,$precedence,$num) = explode('|',$booking);
 					switch($type){
 					case 'radioline':
+						$options = $field->options[ substr( $precedence, 0, 3 ) . '_' . ( $num + 1 ) ]['options'];
+						if ( !isset( $options['value'] ) ) {
+							$options['value'] = 'incrementer';
+							$options['starting_value'] = 1;
+							$options['increment'] = 1;
+						}
 						switch($precedence){
 						case 'row':
-							// Data comes in in the form $_POST['item_meta'][$field_id][$num] = $col_num
-							// So, massage it into $_POST['item_meta'][$field_id][$num] = array($col_num => FrmPlusFieldsHelper::get_simple_on_value())
 							if (isset($_POST['item_meta'][$field_id][$num])){
-								$col_num = $_POST['item_meta'][$field_id][$num];
-								$_POST['item_meta'][$field_id][$num] = array($col_num => FrmPlusFieldsHelper::get_simple_on_value());
+								// Data comes in in the form $_POST['item_meta'][$field_id][$num] = $value
+								// So, massage it into $_POST['item_meta'][$field_id][$num] = array( $col_num => $value )
+								// Need to figure out what column was selected based on the value
+								$c = 0;
+								$value = $_POST['item_meta'][$field_id][$num];
+								while ( ( $column = $field->options['col_' . ( $c + 1 )] ) !== null ) {
+									if ( $options['value'] == 'incrementer' && $value <= ( $options['starting_value'] + ( $c * $options['increment'] ) ) ) {
+										break;
+									} elseif ( $options['value'] == 'header' && $value == ( is_array( $column ) ? $column['name'] : $column ) ) {
+										break;
+									}
+									$c++;
+								}
+								$_POST['item_meta'][$field_id][$num] = array( $c => $value );
 							}
 							break;
 						case 'column':
-							// Data comes in in the form $_POST['item_meta'][$field_id]['transpose'][$num] = $row_num
-							// So, massage it into $_POST['item_meta'][$field_id][$row_num] = array($num => FrmPlusFieldsHelper::get_simple_on_value())
-							if (isset($_POST['item_meta'][$field_id]['transpose'][$num])){
-								$row_num = $_POST['item_meta'][$field_id]['transpose'][$num];
-								if (!isset($_POST['item_meta'][$field_id][$row_num])){
-									$_POST['item_meta'][$field_id][$row_num] = array();
+							if ( isset( $_POST['item_meta'][$field_id]['transpose'][$num] ) ) {
+								// Data comes in in the form $_POST['item_meta'][$field_id]['transpose'][$num] = $value
+								// So, massage it into $_POST['item_meta'][$field_id][$row_num] = array( $num => $value )
+								// Need to figure out what row was selected based on the value
+								$r = 0;
+								$value = $_POST['item_meta'][$field_id]['transpose'][$num];
+								while ( ( $row = $field->options['row_' . ( $r + 1 )] ) !== null ) {
+									if ( $options['value'] == 'incrementer' && $value <= ( $options['starting_value'] + ( $r * $options['increment'] ) ) ) {
+										break;
+									} elseif ( $options['value'] == 'header' && $value == ( is_array( $row ) ? $row['name'] : $row ) ) {
+										break;
+									}
+									$r++;
+								}	
+								if (!isset($_POST['item_meta'][$field_id][$r])){
+									$_POST['item_meta'][$field_id][$r] = array();
 								}
-								$_POST['item_meta'][$field_id][$row_num][$num] = FrmPlusFieldsHelper::get_simple_on_value();
+								$_POST['item_meta'][$field_id][$r][$num] = $value;
+							} else {
+								$_POST['item_meta'][$field_id][0] = array();
 							}
 							break;
 						}

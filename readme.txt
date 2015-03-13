@@ -2,8 +2,8 @@
 Contributors: topquarky
 Tags: formidable, forms, table, new field-type
 Requires at least: 2.5 ( Formidable Pro 1.07.04 or higher is required )
-Tested up to: 3.8.2
-Stable tag: 1.2.5
+Tested up to: 4.1.1
+Stable tag: 1.2.6
 
 This plugin adds a new field type to the Formidable Pro plugin.  It allows you to add a table to your form.
 
@@ -29,7 +29,7 @@ You can have any number of rows and any number of columns.  You can even create 
 
 Recent releases of Formidable Pro have caused headaches with Formidable Plus - breaking things in unexpected places.  Because of this, I am unable to continually test F+ against all previous versions of FPro.  I am only able to support the current version of Formidable Pro.  Odds are good that it will work in previous versions, but I need to focus my development time on the current version.
 
-*Current version of Formidable Pro supported: 1.07.09.*
+*Current version of Formidable Pro supported: 1.07.11.*
 
 = What kinds of fields can I include in a Formidable Plus table? = 
 When you add a table field to your form, the edit widget gives you a dropdown box for each row and column.  The dropdown box contains the available field types.  Currently, these are:
@@ -129,7 +129,7 @@ If you're comfortable writing plugins, you'll want to `add_filter('frmplus_field
 		if (!isset($fruit_options)){
 			$fruit_options = array('Bananas','Oranges','Apples','Peaches','Pears','Plums'); // or fill dynamically somehow
 		}
-		$options = $fruit_options;
+		$options['options'] = $fruit_options;
 	}
 	return $options;
 }`
@@ -155,6 +155,12 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 
 
 == Changelog ==
+
+= 1.2.6 =
+* Fix: Issue with exponential growth in calculation fields
+* Fix: Datepicker after sorting bug ( thanks Scott Gallup )
+* Fix: Radioline rows/columns now behave properly in calculations
+* New: Radioline rows/columns can now take the value of the header, or can be an incrementer value.  
 
 = 1.2.5 = 
 * Fix: fixing issues where table values that got stored as custom post meta were not showing up, and sometimes causing ksort error
