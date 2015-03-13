@@ -74,3 +74,4 @@ $frmplus_forms_controller       = new FrmPlusFormsController();
 $frmplus_fields_controller      = new FrmPlusFieldsController();
 $frmplus_entries_controller     = new FrmPlusEntriesController();
 
+?>
