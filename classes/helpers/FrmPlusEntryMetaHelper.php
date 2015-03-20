@@ -26,6 +26,9 @@ class FrmPlusEntryMetaHelper{
 	public static function frmplus_display_value_custom($value,$field,$atts){
 		switch ($field->type){
 		case 'table':
+			if ( isset( $atts['entry_id'] ) ) {
+				$value = self::fetch( $field->id, $atts['entry_id'] ); // Oh Formidable, why do you hate me.  You've messed up $value by this point, better fetch again
+			}
 			$value = self::sanitize($value,false); // false means we skip stripping slashes (it's already been done)
 			$display_only = true;
 			$field->options = maybe_unserialize($field->options);
@@ -69,7 +72,11 @@ class FrmPlusEntryMetaHelper{
 	function email_value($value, $meta, $entry){
 		switch($meta->field_type){
 		case 'table':
+			if ( isset( $entry->id ) ) {
+				$value = self::fetch( $meta->field_id, $entry->id ); // Oh Formidable, why do you hate me.  You've messed up $value by this point, better fetch again
+			}
 			$value = self::sanitize($value,true); // true means we'll stripslashes
+
 			$display_only = true;
 			$field = $meta;
 			if (isset($meta->fi_options)){
@@ -149,7 +156,7 @@ class FrmPlusEntryMetaHelper{
 		global $frm_entry_meta,$frm_version;
 		$value = $frm_entry_meta->get_entry_meta_by_field($entry_id,$field_id,false); // the false skips the stripslashes
 		// Backward compatibility pre F+ version 1.1.7 and pre FPro 1.06.03
-		if ($frm_version < '1.06.09' and is_array($value)){
+		if ( isset( $frm_version ) && $frm_version < '1.06.09' and is_array($value)){
 			// The old way
 			$value = array_map('maybe_unserialize',$value); // let's unserialize the sucker
 			$value = stripslashes_deep($value); // here's where to strip slashes
@@ -473,7 +480,7 @@ class FrmPlusEntryMetaHelper{
 				$result = $frm_field->getIds('fi.type = "table"');
 				$table_field_ids = array();
 				foreach ($result as $table_field){
-					$table_field_ids[] = $table_field->id;
+					$table_field_ids[] = is_numeric( $table_field ) ? $table_field : $table_field->id;
 				}
 			}
 	
