@@ -120,5 +120,30 @@ jQuery(function($){
 		}
 	});
 	
+	if ( typeof window.frm_add_field_option == 'undefined' ) {
+		$.extend( window, {
+			frm_add_field_option: function(field_id,table){
+				var data = {action:'frm_add_field_option',field_id:field_id,t:table};
+				jQuery.post(ajaxurl,data,function(msg){
+					jQuery('#frm_field_'+field_id+'_opts').append(msg);
+					if(table=='row'){ jQuery('#frm-grid-'+field_id+' tr:last').after(msg);}
+				});
+			},
+			frm_delete_field_option: function(){
+				var cont = jQuery(this).parent('.frm_single_option').attr('id'); 
+				//id = 'frm_delete_field_'+field_id+'-'+opt_key+'_container'
+				var fk=cont.replace('frm_delete_field_', '').replace('_container', '').split('-');
+				jQuery.ajax({type:'POST',url:ajaxurl,
+			        data:'action=frm_delete_field_option&field_id='+fk[0]+'&opt_key='+fk[1],
+			        success:function(msg){
+						jQuery('#'+cont).fadeOut('slow', function(){
+							jQuery('#'+cont).remove();
+						});
+					}
+			    });
+			}
+		});
+	}
+	
 	me.init();
 });

@@ -42,6 +42,7 @@ define('FRMPLUS_ICONS_URL',FRMPLUS_IMAGES_URL.'/error_icons');
 require_once(FRMPLUS_HELPERS_PATH . "/FrmPlusEntriesHelper.php");
 require_once(FRMPLUS_HELPERS_PATH . "/FrmPlusEntryMetaHelper.php");
 require_once(FRMPLUS_HELPERS_PATH . "/FrmPlusFieldsHelper.php");
+require_once(FRMPLUS_HELPERS_PATH . "/FrmPlusAppHelper.php");
 
 global $frmplus_entries_helper;
 global $frmplus_entry_meta_helper;
