@@ -6,6 +6,7 @@ class FrmPlusEntryMetaHelper{
         add_filter('frm_email_value', array($this, 'email_value'), 10, 3);
 		add_filter('frm_hidden_value',array(&$this,'previous_fields_value'),10,2);
 		add_filter('frm_csv_value',array(&$this,'frmplus_csv_value'),10,2);
+		add_filter('frm_plus_adjust_if_repeating',array(&$this,'adjust_if_repeating'),10,2);
 		
 		// Around 1.06.08, Formidable Pro introduced something that really tripped up F+.
 		// Within FrmEntry::validate, there is now this line:
@@ -154,6 +155,7 @@ class FrmPlusEntryMetaHelper{
 		// those characters. This was only a problem when displaying the form
 		// for updating.  I call this function from views/frmplus-fields/form-fields.php
 		global $frm_entry_meta,$frm_version;
+		$entry_id = apply_filters( 'frm_plus_adjust_if_repeating', $entry_id, $field_id );
 		$value = $frm_entry_meta->get_entry_meta_by_field($entry_id,$field_id,false); // the false skips the stripslashes
 		// Backward compatibility pre F+ version 1.1.7 and pre FPro 1.06.03
 		if ( isset( $frm_version ) && $frm_version < '1.06.09' and is_array($value)){
@@ -520,6 +522,85 @@ class FrmPlusEntryMetaHelper{
 			}
 		}
 		return $value;
+	}
+	
+	/**
+	 * A response to Formidable Pro's new Repeatable fields.  They seem to have set it up where the entry_id is 
+	 * for an entry in a "child" form.  
+     * 
+	 * Here's the logic of the big ugly query.  It's possible that the field_id is part of a form which has a parent_id_form_id.
+	 * If that's the case, then we want to find out the field ID of the section that the field_id is in so we can look up entries
+	 * for that field_id for the supplied entry_id.  Once we have those values, which are the entry ids of the items within the
+	 * repeated section, we'll pick them off one by one for the passes through for a given field id, on the ASSUMPTION that
+	 * this will be called for the repeats ALWAYS in the order of the repeats.  
+	 *
+	 * How do we know what the field id of the divider field is?  For the table field supplied, we have the id of its form 
+	 * and by extension, its parent_form.  We also have its field_order.  The divider is the field from the parent_form, but
+	 * with the field_order the first one before the table field supplied.
+	 */ 
+	public function adjust_if_repeating( $entry_id, $field_id ) {
+		static $the_sections,$the_items;
+		
+		// Initialize
+		if ( !isset( $the_sections ) ) {
+			$the_sections = array();
+			$the_items = array();
+		}
+		
+		// Perform the lookup to see if the field_id is part of a repepated section
+		if ( !isset( $the_sections[ $field_id ] ) ) {
+			global $wpdb;
+			// Lookup the divider for this field_id, if it exists
+			$the_sections[ $field_id ] = $wpdb->get_var( 
+				$wpdb->prepare( 
+					"
+					SELECT 
+					  the_section.id
+					FROM 
+					  wp_frm_fields the_table
+					LEFT JOIN
+					  wp_frm_forms the_table_form ON the_table_form.id = the_table.form_id
+					RIGHT JOIN
+					  wp_frm_fields the_section ON the_section.form_id = the_table_form.parent_form_id
+					WHERE
+					  the_table.id = %d
+					  AND the_table.type = 'table' 
+					  AND the_section.type = 'divider'
+					  AND the_section.field_order < the_table.field_order
+					ORDER BY the_section.field_order ASC
+					LIMIT 1
+					",
+					$field_id
+				)	
+			);
+			
+			// Setting to false at so it will pass isset()
+			if ( !isset( $the_sections[ $field_id ] ) ) {
+				$the_sections[ $field_id ] = false;
+			}
+		}
+		
+		// If it's part of a repeating section
+		if ( $the_sections[ $field_id ] ) {
+			// Need to cache on the field_id and the entry_id
+			$key = "{$entry_id}_{$field_id}";
+			if ( empty( $the_items[ $key ] ) ) {
+				global $frm_entry_meta;
+				
+				// Gets the item ids for the section for this entry ( $entry_id )
+				$the_items[ $key ] = $frm_entry_meta->get_entry_meta_by_field( $entry_id, $the_sections[ $field_id ] );
+			}	
+			
+			// If there are entries associated, we'll shift the first element off and use that as the entry_id
+			// Here's the assumption that the items will always be in order.  I've coded for, but really not tested, 
+			// the possibility that we might be needing to find the same values more than one time.  If that's the case, then 
+			// after the first repeating section has been output, $the_items[ $key ] will be empty and ready to be filled
+			// in again with the above -> get_entry_meta_by_field call.  
+			if ( !empty( $the_items[ $key ] ) ) {
+				$entry_id = array_shift( $the_items[ $key ] );
+			}
+		}
+		return $entry_id;
 	}
 }
     
