@@ -169,8 +169,12 @@ jQuery(function($){
 	public function render_callback( $args ){
 		if ( !$this->enqueued ){
 			$this->enqueued = true;
+ 			if ( method_exists( 'FrmStylesHelper', 'enqueue_jquery_css' ) ) {
+				FrmStylesHelper::enqueue_jquery_css();
+			} else {
+			    wp_enqueue_style('jquery-theme');
+			}
 		    wp_enqueue_script('jquery-ui-datepicker');
-		    wp_enqueue_style('jquery-theme');
 			if ( is_admin() && !defined( 'DOING_AJAX' ) ){
 			    add_action( 'admin_footer', array( &$this, 'particulars' ) );
 			}
@@ -198,7 +202,6 @@ jQuery(function($){
 jQuery(function($){
 	<?php foreach ( $this->particulars as $field_id => $instances ) : ?>
 		<?php foreach ( $instances as $key => $options ) : ?>
-			console.log( $('#frm-table-<?php echo "$field_id"; ?>') );
 			$( '#frm-table-<?php echo "$field_id .$key"; ?> input' ).datepicker(<?php echo json_encode( $options ); ?>);
 			$( '#frm-table-<?php echo "$field_id"; ?>' )
 				.on('add_row',function( event, field_id, tr ){

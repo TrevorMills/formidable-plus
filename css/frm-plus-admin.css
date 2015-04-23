@@ -77,3 +77,6 @@
 	content: '\e602';
 	vertical-align: middle;
 }
+.frm_move_field:before {
+  content: '\e61a';
+}

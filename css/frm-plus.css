@@ -97,3 +97,6 @@
 .ui-sortable-helper{
 	background:#F5F5F5;
 }
+.entry-content .frm-table-container a img{
+	display:inline;
+}

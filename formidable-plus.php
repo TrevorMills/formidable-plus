@@ -5,7 +5,7 @@
 /*
 Plugin Name: Formidable Plus
 Description: Adds a table field-type
-Version: 2.0.0beta
+Version: 2.0.1beta
 Plugin URI: http://topquark.com/extend/plugins/formidable-plus
 Author URI: http://topquark.com
 Author: topquarky
@@ -42,6 +42,7 @@ define('FRMPLUS_ICONS_URL',FRMPLUS_IMAGES_URL.'/error_icons');
 require_once(FRMPLUS_HELPERS_PATH . "/FrmPlusEntriesHelper.php");
 require_once(FRMPLUS_HELPERS_PATH . "/FrmPlusEntryMetaHelper.php");
 require_once(FRMPLUS_HELPERS_PATH . "/FrmPlusFieldsHelper.php");
+require_once(FRMPLUS_HELPERS_PATH . "/FrmPlusAppHelper.php");
 
 global $frmplus_entries_helper;
 global $frmplus_entry_meta_helper;

@@ -171,10 +171,11 @@ class FrmPlusFieldsController{
 				}
 			}
 
-		}
-		
-		// Now that we've done our duty, carry on to FrmFieldsController::delete_option to actually delete the option
-		FrmFieldsController::delete_option();
+	        unset($options[$_POST['opt_key']]);
+	        $frm_field->update($_POST['field_id'], array('options' => maybe_serialize($options)));
+			echo json_encode( array( 'other' => true ) );
+			die();
+		}		
 	}
 	
 	/** 
