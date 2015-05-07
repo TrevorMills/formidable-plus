@@ -20,7 +20,7 @@ jQuery(function($){
 						update_value: $(this).val()
 					}, function(){
 						if ( reopen ){
-							$form.parents( '.frm_single_option' ).find( '.frmplus_field_options' ).trigger( 'click' );
+							$form.parents( '.frm_single_option' ).find( '.frmplus_field_options' ).trigger( 'mouseup' );
 						}
 					});
 					if ( me.types_with_options.indexOf( $(this).val() ) != -1 ){
@@ -30,7 +30,7 @@ jQuery(function($){
 						$(this).parents( '.frm_single_option' ).find( '.frmplus_field_options' ).hide();
 					}
 				})
-				.on( 'click', '.frmplus_field_options', function(){
+				.on( 'mouseup', '.frmplus_field_options', function(){
 					var $form = $(this).parents( '.frm_single_option' ).find( '.frmplus_options_form' );
 					
 					// Close, without saving, any other options forms that are open
