@@ -206,13 +206,13 @@ jQuery( function($){
 		}
 		else{
 	        global $frm_field;
-	        $fields = $frm_field->getAll(array('fi.form_id' => (int)$form_id, 'field_order') ); 
+	        $fields = $frm_field->getAll(array('fi.form_id' => (int)$form_id), 'field_order');
 			$taxonomies = false;
 			if ( !isset( $field_id ) ){
 				$field_id = false;
 			}
 		}
-		ob_start(); 
+		ob_start();
 		if ( $fields || $taxonomies ) :?>
 			<select name="<?php echo $field_name; ?>">
 			<?php if ( $fields ) : ?>
