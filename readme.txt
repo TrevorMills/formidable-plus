@@ -1,7 +1,7 @@
 === Formidable Plus ===
 Contributors: topquarky
 Tags: formidable, forms, table, new field-type
-Requires at least: 2.5 ( Formidable Pro 1.07.04 or higher is required )
+Requires at least: 3.0 ( Formidable Pro 1.07.04 or higher is required )
 Tested up to: 4.1.1
 Stable tag: 2.0.2
 
@@ -155,6 +155,9 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 
 
 == Changelog ==
+
+= 2.0.0beta = 
+* Changes to Formidable Plus to make it work with Formidable Pro 2.0
 
 = 1.2.6.1 =
 * Critical fix: Fatal error.  
