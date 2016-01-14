@@ -32,7 +32,8 @@ define('FRMPLUS_MODELS_PATH',FRMPLUS_PATH.'/classes/models');
 define('FRMPLUS_VIEWS_PATH',FRMPLUS_PATH.'/classes/views');
 define('FRMPLUS_TEMPLATES_PATH',FRMPLUS_PATH.'/classes/templates');
 
-define('FRMPLUS_URL',WP_PLUGIN_URL.'/'.FRMPLUS_PLUGIN_NAME);
+// Make the URL protocol agnostic by stripping off the leading http: or https:
+define('FRMPLUS_URL', preg_replace( '#^[^/]+#', '', WP_PLUGIN_URL.'/'.FRMPLUS_PLUGIN_NAME ) );
 define('FRMPLUS_MODELS_URL',FRMPLUS_URL.'/classes/models');
 define('FRMPLUS_VIEWS_URL',FRMPLUS_URL.'/classes/views');
 define('FRMPLUS_IMAGES_URL',FRMPLUS_URL.'/images');

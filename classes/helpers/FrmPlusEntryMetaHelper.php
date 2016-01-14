@@ -24,7 +24,7 @@ class FrmPlusEntryMetaHelper{
 		add_action('init',array(&$this,'setup_multi_page_shortcodes'));
     }
 
-	public static function frmplus_display_value_custom($value,$field,$atts){
+	public static function frmplus_display_value_custom($value,$field,$atts=array()){
 		switch ($field->type){
 		case 'table':
 			if ( isset( $atts['entry_id'] ) ) {
