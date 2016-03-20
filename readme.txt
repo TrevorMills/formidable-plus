@@ -1,5 +1,5 @@
 === Formidable Plus ===
-Contributors: topquarky
+Contributors: Trevor Mills
 Tags: formidable, forms, table, new field-type
 Requires at least: 3.0 ( Formidable Pro 1.07.04 or higher is required )
 Tested up to: 4.1.1
