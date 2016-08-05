@@ -1,9 +1,9 @@
 === Formidable Plus ===
-Contributors: topquarky
+Contributors: Trevor Mills
 Tags: formidable, forms, table, new field-type
 Requires at least: 3.0 ( Formidable Pro 1.07.04 or higher is required )
 Tested up to: 4.1.1
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 
 This plugin adds a new field type to the Formidable Pro plugin.  It allows you to add a table to your form.
 
@@ -155,6 +155,9 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 
 
 == Changelog ==
+
+= 2.0.3 =
+* Changed author from topquarky to Trevor Mills. I always hated that name.
 
 = 2.0.0beta = 
 * Changes to Formidable Plus to make it work with Formidable Pro 2.0

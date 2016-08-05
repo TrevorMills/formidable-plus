@@ -5,13 +5,16 @@
 /*
 Plugin Name: Formidable Plus
 Description: Adds a table field-type
-Version: 2.0.2
+Version: 2.0.3beta
 Plugin URI: http://topquark.com/extend/plugins/formidable-plus
 Author URI: http://topquark.com
-Author: topquarky
+Author: Trevor Mills
 */
 
-/*  Copyright 2014  topquark  (email : support@topquark.com)
+/*  Copyright 2014-2016  Trevor Mills  (email : support@topquark.com)
+
+    Note: author changed from topquark to Trevor Mills at version 2.0.3
+          of this software
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
