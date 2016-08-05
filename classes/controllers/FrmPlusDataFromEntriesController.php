@@ -282,7 +282,7 @@ jQuery( function($){
 			
 			$cache = $values;
 		}
-		return $values;
+		return apply_filters( 'frm_plus_data_from_entries_values', $values, $options, $entry_id );
 	}
 	
 	public function render_callback( $args ){
