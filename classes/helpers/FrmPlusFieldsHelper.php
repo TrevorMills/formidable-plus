@@ -171,30 +171,31 @@ class FrmPlusFieldsHelper{
 				$_entry_name = $matches[2];
 			}
 			// In case a form uses dynamic values from another form multiple times, we'll do some caching
-			if (!is_array($this->cached_forms)){
-				$this->cached_forms = array();
-				$this->cached_entries = array();
-				$this->cached_fields = array();
-			}
-			if (($form_id = $this->cached_forms[$_form_key]) or is_numeric($form_id = $_form_key) or ($form_id = $frm_form->getIdByKey($_form_key))){
-				$this->cached_forms[$_form_key] = $form_id;
+            static $cached_forms;
+			if ( ! isset( $cached_forms ) ) {
+				$cached_forms = array();
+				$cached_entries = array();
+				$cached_fields = array();
+            }
+			if (($form_id = $cached_forms[$_form_key]) or is_numeric($form_id = $_form_key) or ($form_id = $frm_form->getIdByKey($_form_key))){
+				$cached_forms[$_form_key] = $form_id;
 				if (is_numeric($_field_key)){
 					$field_id = $_field_key;
 				}
 				else{
-					if (!isset($this->cached_fields[$form_id])){
-						$this->cached_fields[$form_id] = array();
+					if (!isset($cached_fields[$form_id])){
+						$cached_fields[$form_id] = array();
 						$fields = $frm_field->getAll('fr.id = '.$form_id);
 						foreach ($fields as $field){
-							$this->cached_fields[$form_id][$field->field_key] = $field->id;
+							$cached_fields[$form_id][$field->field_key] = $field->id;
 						}
 					}
-					$field_id = $this->cached_fields[$form_id][$_field_key];
+					$field_id = $cached_fields[$form_id][$_field_key];
 				}
 				
 				if ($field_id){
 					// We found the form, now let's see if the current user has filled one out.
-					if(!($entry = $this->cached_entries[$form_id])){
+					if(!($entry = $cached_entries[$form_id])){
 						$entries = frmplus_entries_helper::get_entries_with_user_id($user_ID,$form_id);
 						if (is_array($entries) and count($entries)){
 							// Find the Entry Name 
@@ -214,7 +215,7 @@ class FrmPlusFieldsHelper{
 					
 					if ($entry){
 						$entry->values = $frm_entry_meta->get_entry_meta_info($entry->id);
-						$this->cached_entries[$form_id] = $entry;
+						$cached_entries[$form_id] = $entry;
 						foreach ($entry->values as $entry_meta){
 							if ($entry_meta->meta_key == $_field_key){
 								return stripslashes($entry_meta->meta_value);
