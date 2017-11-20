@@ -19,7 +19,7 @@
 			<?php endforeach; ?>
 		</select>
 		<span class="frmplus_field_options icon16" id="field_<?php echo $field['id']?>-<?php echo $opt_key ?>-options" <?php echo ( in_array( $type, FrmPlusFieldsHelper::get_types( 'with_options' ) ) ? '' : 'style="display:none"' ); ?>></span>
-    <span class="frm_ipe_field_option" id="field_<?php echo $field['id']?>-<?php echo $opt_key ?>"><?php echo $name ?></span>
+    <span class="frm_ipe_field_option frm_ipe_table_field" id="field_<?php echo $field['id']?>-<?php echo $opt_key ?>"><?php echo $name ?></span>
 	<div class="frmplus_options_form">
 		<div class="form-contents">
 			<!-- this gets filled in via AJAX -->
