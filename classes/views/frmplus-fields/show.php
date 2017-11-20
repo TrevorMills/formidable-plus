@@ -32,6 +32,10 @@
 	</div> <!-- frm_row_list_<?php echo $field['id']; ?> -->
 	</div> <!-- frm-show-click -->
 
+	<!-- putting this field to work around a potential Javascript error from Formidable Pro -->
+	<input type="checkbox" id="separate_value_<?php echo $field['id']; ?>" style="display:none" />
+
+
 	<script type="text/javascript">
 	jQuery(function($){
 		$("#frm_column_list_<?php echo $field['id']; ?>").sortable({
