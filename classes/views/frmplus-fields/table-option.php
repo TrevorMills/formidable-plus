@@ -27,4 +27,6 @@
 	</div>
 </span>
 <div class="clear"></div>
+<!-- adding to prevent Formidable Javascript error -->
+<span class="frm_other_option" style="display:none"></span>
 </div> <!-- frm_single_option_sortable -->

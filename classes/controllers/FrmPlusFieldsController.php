@@ -122,7 +122,7 @@ class FrmPlusFieldsController{
 	 */
 	function delete_option(){
         global $frm_field;
-		
+
 		// if opt_key begins with 'col' or 'row'
 		if (in_array($t = substr($_POST['opt_key'],0,3),array('col','row'))){
 			$id = $_POST['field_id'];
@@ -145,7 +145,7 @@ class FrmPlusFieldsController{
 			// We need to go through all of the entry_metas and remove the data corresponding to this field
 			global $wpdb;
 			$frmdb = & FrmPlusAppController::get_frmdb();
-			$metas = $wpdb->get_results("SELECT id, meta_value FROM {$frmdb->entry_metas} WHERE field_id={$id}");
+			$metas = $wpdb->get_results( $wpdb->prepare( "SELECT id, meta_value FROM {$frmdb->entry_metas} WHERE field_id=%d", $id ) );
 			if (is_array($metas)){
 				foreach ($metas as $meta){
 					$data = FrmPlusEntryMetaHelper::sanitize(maybe_unserialize($meta->meta_value),true); // true = stripslashes
