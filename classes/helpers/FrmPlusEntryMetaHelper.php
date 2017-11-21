@@ -3,6 +3,7 @@
 class FrmPlusEntryMetaHelper{
     function FrmPlusEntryMetaHelper(){
         add_filter('frm_display_value_custom', 'FrmPlusEntryMetaHelper::frmplus_display_value_custom', 10, 3);
+        add_filter('frm_display_value_atts','FrmPlusEntryMetaHelper::display_value_atts', 10, 3);
         add_filter('frm_email_value', array($this, 'email_value'), 10, 3);
 		add_filter('frm_hidden_value',array(&$this,'previous_fields_value'),10,2);
 		add_filter('frm_csv_value',array(&$this,'frmplus_csv_value'),10,2);
@@ -51,6 +52,13 @@ class FrmPlusEntryMetaHelper{
 			break;
 		}		
 		return $value;
+	}
+
+	public static function display_value_atts( $atts, $field, $value ) {
+		if ( 'table' === $field->type ) {
+			$atts['keepjs'] = true; // Doing this prevents Formidable from calling wp_kses on this field value
+		}
+		return $atts;
 	}
 	
 	public static function frm_display_value_once( $value, $field = null, $atts = array() ){
