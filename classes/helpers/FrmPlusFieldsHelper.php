@@ -160,7 +160,7 @@ class FrmPlusFieldsHelper{
 	 * Note: this will only work when the user who is submitting the form is logged-in.  
 	 */
     public static function get_default_value($value){
-		global $frm_form,$frm_field,$frm_entry_meta,$user_ID;
+		global $user_ID;
 		if (!is_array($value) and preg_match("/\[([^\.]+)\.([^\]]+)\]/",$value,$matches)){
 			// This checks for something of the form [form_key.field_key]
 			// It will also allow [form_key{entry_name}.field_key] to get the field_key value from a specific entry
@@ -177,7 +177,7 @@ class FrmPlusFieldsHelper{
 				$cached_entries = array();
 				$cached_fields = array();
             }
-			if (($form_id = $cached_forms[$_form_key]) or is_numeric($form_id = $_form_key) or ($form_id = $frm_form->getIdByKey($_form_key))){
+			if (($form_id = $cached_forms[$_form_key]) or is_numeric($form_id = $_form_key) or ($form_id = FrmForm::getIdByKey($_form_key))){
 				$cached_forms[$_form_key] = $form_id;
 				if (is_numeric($_field_key)){
 					$field_id = $_field_key;
@@ -185,7 +185,7 @@ class FrmPlusFieldsHelper{
 				else{
 					if (!isset($cached_fields[$form_id])){
 						$cached_fields[$form_id] = array();
-						$fields = $frm_field->getAll('fr.id = '.$form_id);
+						$fields = FrmField::getAll('fr.id = '.$form_id);
 						foreach ($fields as $field){
 							$cached_fields[$form_id][$field->field_key] = $field->id;
 						}
@@ -214,7 +214,7 @@ class FrmPlusFieldsHelper{
 					}
 					
 					if ($entry){
-						$entry->values = $frm_entry_meta->get_entry_meta_info($entry->id);
+						$entry->values = FrmEntryMeta::get_entry_meta_info($entry->id);
 						$cached_entries[$form_id] = $entry;
 						foreach ($entry->values as $entry_meta){
 							if ($entry_meta->meta_key == $_field_key){
@@ -232,12 +232,12 @@ class FrmPlusFieldsHelper{
 	
 	// Kept in for legacy, but really, this is handled by frmplus_replace_shortcodes below
 	public static function frm_table_display($atts){
-		global $post,$frmpro_display,$frm_entry,$frm_entry_meta,$frm_field;
+		global $post;
 		if (!isset($atts['id']) and !isset($atts['key'])){
 			$replace_with = "Proper usage: [frm_table_display id=N] (replace N with the field ID) or [frm_table_display key=K] (replace K with the field KEY)";
 		}
 		else{
-	        $display = $frmpro_display->getAll("insert_loc != 'none' and post_id=".$post->ID, '', ' LIMIT 1');
+	        $display = FrmProDisplay::getAll("insert_loc != 'none' and post_id=".$post->ID, '', ' LIMIT 1');
 	        if (is_numeric($display->entry_id) && $display->entry_id > 0 and !$entry_id)
 	            $entry_id = $display->entry_id;
 
@@ -245,14 +245,14 @@ class FrmPlusFieldsHelper{
 	        if ($get_param){
 	            $where_entry = (is_numeric($get_param)) ? "it.id" : "it.item_key";
 	            $where_entry .= "='{$get_param}' and it.form_id=". $display->form_id;
-	            $entry = $frm_entry->getAll($where_entry, '', ' LIMIT 1');
+	            $entry = FrmEntry::getAll($where_entry, '', ' LIMIT 1');
 	            if($entry)
 	                $entry = $entry[0];
 	        }
 	        if ($entry and $entry->form_id == $display->form_id){
-	            $field = $frm_field->getOne( (isset($atts['id']) ? $atts['id'] : $atts['key'] ));
+	            $field = FrmField::getOne( (isset($atts['id']) ? $atts['id'] : $atts['key'] ));
 				if ($field){
-		            $value = maybe_unserialize($frm_entry_meta->get_entry_meta_by_field($entry->id, $field->id, true));
+		            $value = maybe_unserialize(FrmEntryMeta::get_entry_meta_by_field($entry->id, $field->id, true));
 				}
 				if (is_array($value)){
 					$replace_with = FrmPlusEntryMetaHelper::frmplus_display_value_custom($value,$field,array());
@@ -481,10 +481,9 @@ class FrmPlusFieldsHelper{
 	}
 	
 	function perform_massage($atts){
-		global $frm_field;
 		if (isset($_POST['frmplus_massage_fields'])){
 			foreach ($_POST['frmplus_massage_fields'] as $field_id => $bookings){
-				$field = $frm_field->getOne($field_id);
+				$field = FrmField::getOne($field_id);
 				foreach ($bookings as $booking){
 					list($type,$precedence,$num) = explode('|',$booking);
 					switch($type){

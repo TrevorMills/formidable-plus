@@ -146,8 +146,8 @@ class FrmPlusCalculationsController{
 			</select>
 			<?php _e( 'of these fields into this field: ', FRMPLUS_PLUGIN_NAME ); ?>
 			<?php 
-				global $frm_field, $wpdb;
-				$fields = $frm_field->getAll( $wpdb->prepare( 'fi.form_id = %d AND fi.type IN ( "text", "number", "hidden" )', $field->form_id ), 'field_order');
+				global $wpdb;
+				$fields = FrmField::getAll( $wpdb->prepare( 'fi.form_id = %d AND fi.type IN ( "text", "number", "hidden" )', $field->form_id ), 'field_order');
 			?>
 			<select name="frmplus_options[other][id]">
 				<option value="">--<?php _e( 'Choose a field', FRMPLUS_PLUGIN_NAME ); ?>--</option>
@@ -196,10 +196,9 @@ class FrmPlusCalculationsController{
 	}
 	
 	public function prepareForLocalization( $particulars ){
-		global $frm_field;
 		//echo '<pre>' . print_r( $particulars, true ) . '</pre>';
 		foreach ( $particulars as $field_id => $table_fields ){
-			$field = $frm_field->getOne( $field_id );
+			$field = FrmField::getOne( $field_id );
 			list( $columns, $rows ) = FrmPlusFieldsHelper::get_table_options( maybe_unserialize($field->options) );
 			//echo '<pre>' . print_r( $rows, true ) . '</pre>';
 			foreach ( $table_fields as $key => $settings ){

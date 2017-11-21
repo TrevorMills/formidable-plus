@@ -75,10 +75,9 @@ class FrmPlusDataFromEntriesController{
 	}
 	
 	public function options_callback( $options, $field, $index ){ 
-		global $frm_form, $frm_field;
 		$options = $this->massageOptions( $options );
 		$id = "data-options-" . substr( md5( time() ), 0, 5 ); // random id for the DOM element
-		$forms = $frm_form->getAll( "is_template=0 AND (status is NULL OR status = '' OR status = 'published')", 'order by name');
+		$forms = FrmForm::getAll( "is_template=0 AND (status is NULL OR status = '' OR status = 'published')", 'order by name');
 	    list($cols,$rows) = FrmPlusFieldsHelper::get_table_options( maybe_unserialize($field->options) );
 		$is_a = substr($index,0,3); // 'row' or 'col'
 		?>
@@ -205,8 +204,7 @@ jQuery( function($){
 			$taxonomies = get_taxonomies(array( 'public' => true ), 'objects');
 		}
 		else{
-	        global $frm_field;
-	        $fields = $frm_field->getAll(array('fi.form_id' => (int)$form_id), 'field_order');
+	        $fields = FrmField::getAll(array('fi.form_id' => (int)$form_id), 'field_order');
 			$taxonomies = false;
 			if ( !isset( $field_id ) ){
 				$field_id = false;
@@ -268,8 +266,7 @@ jQuery( function($){
 					'hide_opt' => false,
 					'restrict' => $options['restrict']
 				);
-				global $frm_field;
-				$field = $frm_field->getOne( $options['source']['field'] );
+				$field = FrmField::getOne( $options['source']['field'] );
 				$field->field_options['data_type'] = 'select';	// Set this to ensure we always get a '' => '' value at the beginning
 				
 				if ( isset( $entry_id ) ){

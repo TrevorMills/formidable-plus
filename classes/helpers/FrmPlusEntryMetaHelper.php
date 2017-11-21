@@ -8,7 +8,7 @@ class FrmPlusEntryMetaHelper{
 		add_filter('frm_hidden_value',array(&$this,'previous_fields_value'),10,2);
 		add_filter('frm_csv_value',array(&$this,'frmplus_csv_value'),10,2);
 		add_filter('frm_plus_adjust_if_repeating',array(&$this,'adjust_if_repeating'),10,2);
-		
+
 		// Around 1.06.08, Formidable Pro introduced something that really tripped up F+.
 		// Within FrmEntry::validate, there is now this line:
 		//
@@ -18,9 +18,9 @@ class FrmPlusEntryMetaHelper{
 		// which means that if a table is entered with just one row, then the table/array
 		// nature of the posted field gets clobbered.  These two actions are my workaround for that.
 		// The workaround is basically to add a 'spoof' row to every table field so count($value) != 1
-		add_action('init',array(&$this,'setup_spoofs')); 
+		add_action('init',array(&$this,'setup_spoofs'));
 		add_filter('frm_validate_entry',array(&$this,'get_rid_of_spoofs'),10,2); // The last filter in FrmEntry::validate
-		
+
 		// See the comments at the supplied method
 		add_action('init',array(&$this,'setup_multi_page_shortcodes'));
     }
@@ -94,8 +94,7 @@ class FrmPlusEntryMetaHelper{
 			else{
 				// Oh Formidable, you're making my life very difficult these days.  
 				// With 1.06.08, the way the [default-message] got rendered changed.  This seems to fix it.
-				global $frm_field;
-				$tmp = $frm_field->getOne($field->field_id);
+				$tmp = FrmField::getOne($field->field_id);
 				$field->options = maybe_unserialize($tmp->options);
 			}
 			$field = (array) $field;
@@ -162,9 +161,9 @@ class FrmPlusEntryMetaHelper{
 		// some (admittedly edge case) scenarios where the table contained
 		// those characters. This was only a problem when displaying the form
 		// for updating.  I call this function from views/frmplus-fields/form-fields.php
-		global $frm_entry_meta,$frm_version;
+		global $frm_version;
 		$entry_id = apply_filters( 'frm_plus_adjust_if_repeating', $entry_id, $field_id );
-		$value = $frm_entry_meta->get_entry_meta_by_field($entry_id,$field_id,false); // the false skips the stripslashes
+		$value = FrmEntryMeta::get_entry_meta_by_field($entry_id,$field_id,false); // the false skips the stripslashes
 		// Backward compatibility pre F+ version 1.1.7 and pre FPro 1.06.03
 		if ( isset( $frm_version ) && $frm_version < '1.06.09' and is_array($value)){
 			// The old way
@@ -187,12 +186,10 @@ class FrmPlusEntryMetaHelper{
 				$fields = array();
 			}
 			if (!array_key_exists($entry_id,$entries)){
-				global $frm_entry;
-				$entries[$entry_id] = $frm_entry->getOne($entry_id,true);
+				$entries[$entry_id] = FrmEntry::getOne($entry_id,true);
 			}
 			if (!array_key_exists($field_id,$fields)){
-				global $frm_field;
-				$fields[$field_id] = $frm_field->getOne($field_id);
+				$fields[$field_id] = FrmField::getOne($field_id);
 			}
 			$entry = $entries[$entry_id];
 			$field = $fields[$field_id];
@@ -408,8 +405,7 @@ class FrmPlusEntryMetaHelper{
 		// We're going to get all table fields in the currently posted form. 
 		// We can then spoof a row into those table fields so that the piece in 
 		// FrmEntry::validate that clobbers single row arrays doesn't trigger
-		global $frm_field;
-		$table_fields = $frm_field->getAll('fi.form_id='. (int)$_POST['form_id'].' AND fi.type = "table"');
+		$table_fields = FrmField::getAll('fi.form_id='. (int)$_POST['form_id'].' AND fi.type = "table"');
 		
 		static $spoofed_field_ids;
 		if (!isset($spoofed_field_ids)){
@@ -486,14 +482,13 @@ class FrmPlusEntryMetaHelper{
         preg_match_all( "/\[(\d*)\b(.*?)(?:(\/))?\]/s", $html, $matches, PREG_PATTERN_ORDER); // copied from FrmProFieldsHelper::get_default_value() method
         if (isset($matches[0]) and !empty($matches[0])){
 			if (!isset($table_field_ids)){
-				global $frm_field;
-				$result = $frm_field->getIds('fi.type = "table"');
+				$result = FrmField::getAll('fi.type = "table"');
 				$table_field_ids = array();
 				foreach ($result as $table_field){
 					$table_field_ids[] = is_numeric( $table_field ) ? $table_field : $table_field->id;
 				}
 			}
-	
+
             foreach ($matches[0] as $match_key => $val){
                 $shortcode = $matches[1][$match_key];
                 if(is_numeric($shortcode) and isset($_POST['item_meta'][$shortcode]) and in_array($shortcode,$table_field_ids) and !in_array($shortcode,$saved_item_metas)){ 
@@ -593,10 +588,8 @@ class FrmPlusEntryMetaHelper{
 			// Need to cache on the field_id and the entry_id
 			$key = "{$entry_id}_{$field_id}";
 			if ( empty( $the_items[ $key ] ) ) {
-				global $frm_entry_meta;
-				
 				// Gets the item ids for the section for this entry ( $entry_id )
-				$the_items[ $key ] = $frm_entry_meta->get_entry_meta_by_field( $entry_id, $the_sections[ $field_id ] );
+				$the_items[ $key ] = FrmEntryMeta::get_entry_meta_by_field( $entry_id, $the_sections[ $field_id ] );
 			}	
 			
 			// If there are entries associated, we'll shift the first element off and use that as the entry_id

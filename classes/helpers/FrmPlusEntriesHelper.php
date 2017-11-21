@@ -10,7 +10,7 @@ class FrmPlusEntriesHelper{
 	 *  - if $form_id is not blank, it limits entries to a particular form
 	 */
 	public static function get_entries_with_user_id($user_id = "",$form_id = ""){
-		global $frm_entry_meta,$wpdb;
+		global $wpdb;
 		
 		$where_meta = "fi.type = 'user_id'";
 		if ($user_id == ""){
@@ -31,7 +31,7 @@ class FrmPlusEntriesHelper{
 		else{
 			$where_meta.= $wpdb->prepare(" and fi.form_id = %s",$form_id);
 		}
-		$entry_metas = $frm_entry_meta->getAll($where_meta,' ORDER BY it.meta_value ASC, it.created_at DESC');
+		$entry_metas = FrmEntryMeta::getAll($where_meta,' ORDER BY it.meta_value ASC, it.created_at DESC');
 		$return = array();
 		
 		if (!count($entry_metas)){
@@ -44,9 +44,8 @@ class FrmPlusEntriesHelper{
 		foreach ($entry_metas as $e){
 			$entry_ids[] = $e->item_id;
 		}
-		global $frm_entry;
 		$where_meta = $wpdb->prepare(" it.id in (%s".str_repeat(",%s",count($entry_ids) - 1).")",$entry_ids);
-		$_entries = $frm_entry->getAll($where_meta,' ORDER BY it.created_at DESC');
+		$_entries = FrmEntry::getAll($where_meta,' ORDER BY it.created_at DESC');
 		$entries = array();
 		foreach ($_entries as $e){
 			$entries[$e->id] = (object) array('created_at' => $e->created_at, 'name' => $e->name);
