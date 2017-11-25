@@ -20,7 +20,7 @@ class FrmPlusAppController{
 		}
 		if ( is_admin() ){
 	        wp_enqueue_style('frmplus-admin', FRMPLUS_URL . '/css/frm-plus-admin.css' );
-	        wp_enqueue_script('frmplus-admin', FRMPLUS_URL . '/js/frm-plus-admin.js?nc=' . filemtime( FRMPLUS_DIR_NAME . '/js/frm-plus-admin.js' ) )	;
+	        wp_enqueue_script('frmplus-admin', FRMPLUS_URL . '/js/frm-plus-admin.js?nc=' . filemtime( FRMPLUS_PATH . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . 'frm-plus-admin.js' ) )	;
 			wp_localize_script( 'frmplus-admin', 'FRMPLUS', array(
 				'types_with_options' => FrmPlusFieldsHelper::get_types( 'with_options' )
 			));
