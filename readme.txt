@@ -5,7 +5,7 @@ Requires at least: 3.0 ( Formidable Pro 2.0 or higher is required )
 Tested up to: 4.9
 Stable tag: 2.0.5
 
-*This plugin is no longer in active development or support.  You are free to [download the ZIP file](https://github.com/TrevorMills/formidable-plus/archive/2.0.3.zip) and use it on your WordPress site.  If you have questions, you can use the [Github Issues](https://github.com/TrevorMills/formidable-plus/issues) page and I will try to help.  No automatic updates will be provided.*
+*This plugin is no longer in active development or support.  You are free to [download the ZIP file](https://github.com/TrevorMills/formidable-plus/archive/2.0.5.zip) and use it on your WordPress site.  If you have questions, you can use the [Github Issues](https://github.com/TrevorMills/formidable-plus/issues) page and I will try to help.  No automatic updates will be provided.*
 
 This plugin adds a new field type to the Formidable Pro plugin.  It allows you to add a table to your form.
 
@@ -21,7 +21,7 @@ You can have any number of rows and any number of columns.  You can even create 
 
 == Installation ==
 
-1. [Download the ZIP file](https://github.com/TrevorMills/formidable-plus/archive/2.0.3.zip) from Github
+1. [Download the ZIP file](https://github.com/TrevorMills/formidable-plus/archive/2.0.5.zip) from Github
 1. Install the ZIP file to your server and activate the plugin
 
 == Frequently Asked Questions ==
