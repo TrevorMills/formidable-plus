@@ -15,7 +15,7 @@
     <tr valign="top">
         <th scope="row"><?php echo stripslashes($field->name) ?>:</th>
         <td>
-            <?php $field_value = $frm_entry_meta->get_entry_meta_by_field($entry->id, $field->id, true);
+            <?php $field_value = FrmEntryMeta::get_entry_meta_by_field($entry->id, $field->id, true);
               echo FrmProEntryMetaHelper::display_value($field_value, $field, array('type' => $field->type));
             ?>
         </td>

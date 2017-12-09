@@ -34,13 +34,11 @@ class FrmPlusFieldsController{
 	 * Called when a row or column is added to the table field within the admin area
 	 */
 	function add_option(){
-        global $frm_field;
-
         $id = $_POST['field_id'];
 		// If the field_id begins with 'row' or 'col'
 		if (in_array($t = substr($id,0,3),array('col','row'))){
 			$id = substr($id,4);
-	        $field = $frm_field->getOne($id);
+	        $field = FrmField::getOne($id);
 			if (!$field){
 				return;
 			}
@@ -75,7 +73,7 @@ class FrmPlusFieldsController{
 		        $rows[$opt_key] = $opt;
 			}
 			$options = FrmPlusFieldsHelper::set_table_options($options,$columns,$rows);
-	        $frm_field->update($id, array('options' => serialize($options)));
+	        FrmField::update($id, array('options' => serialize($options)));
 	
 			// Now that we've added it, we need to update all item metas to have matching arrays
 			// This is so that when we delete a row/column and then remove data from the item metas
@@ -98,7 +96,7 @@ class FrmPlusFieldsController{
 				}
 			}
 
-	        $field_data = $frm_field->getOne($id);
+	        $field_data = FrmField::getOne($id);
 	        $field = array();
 	        $field['type'] = $field_data->type;
 	        $field['id'] = $id;
@@ -121,12 +119,10 @@ class FrmPlusFieldsController{
 	 * Called when a row or column is deleted from the table field within the admin area
 	 */
 	function delete_option(){
-        global $frm_field;
-		
 		// if opt_key begins with 'col' or 'row'
 		if (in_array($t = substr($_POST['opt_key'],0,3),array('col','row'))){
 			$id = $_POST['field_id'];
-	        $field = $frm_field->getOne($id);
+	        $field = FrmField::getOne($id);
 			if (!$field){
 				return;
 			}
@@ -145,7 +141,7 @@ class FrmPlusFieldsController{
 			// We need to go through all of the entry_metas and remove the data corresponding to this field
 			global $wpdb;
 			$frmdb = & FrmPlusAppController::get_frmdb();
-			$metas = $wpdb->get_results("SELECT id, meta_value FROM {$frmdb->entry_metas} WHERE field_id={$id}");
+			$metas = $wpdb->get_results( $wpdb->prepare( "SELECT id, meta_value FROM {$frmdb->entry_metas} WHERE field_id=%d", $id ) );
 			if (is_array($metas)){
 				foreach ($metas as $meta){
 					$data = FrmPlusEntryMetaHelper::sanitize(maybe_unserialize($meta->meta_value),true); // true = stripslashes
@@ -172,7 +168,7 @@ class FrmPlusFieldsController{
 			}
 
 	        unset($options[$_POST['opt_key']]);
-	        $frm_field->update($_POST['field_id'], array('options' => maybe_serialize($options)));
+	        FrmField::update($_POST['field_id'], array('options' => maybe_serialize($options)));
 			echo json_encode( array( 'other' => true ) );
 			die();
 		}		
@@ -254,10 +250,9 @@ class FrmPlusFieldsController{
 	 * - returns the markup for the table row.
 	 */
 	function add_table_row(){
-        global $frm_field;
 		extract($_POST);
 
-        $field_data = $frm_field->getOne($field_id );
+        $field_data = FrmField::getOne($field_id );
         $options = maybe_unserialize($field_data->options);
 	    list($columns,$rows) = FrmPlusFieldsHelper::get_table_options($options);
 	
@@ -282,10 +277,9 @@ class FrmPlusFieldsController{
 	 */
 	function reorder_table_options(){
 		// When reordering fields, it is vital that we reorder any data that might exist for 
-        global $frm_field;
 		extract($_POST);
 
-        $field = $frm_field->getOne($field_id);
+        $field = FrmField::getOne($field_id);
 		if (!$field or $field->type != 'table'){
 			die();
 		}
@@ -316,7 +310,7 @@ class FrmPlusFieldsController{
 		else{
 			$options = FrmPlusFieldsHelper::set_table_options($options,$columns,$new);
 		}
-        $frm_field->update($field_id, array('options' => serialize($options)));
+        FrmField::update($field_id, array('options' => serialize($options)));
 		
 		// Now that we've updated the field, let's update the item_metas
 		global $wpdb;

@@ -115,7 +115,26 @@ jQuery(function($){
 						$( document ).on( 'ajaxComplete', showMe );
 					}
 				})
-				;
+				// Formidable no longer does AJAX to update its in-place-edit fields.  But, for simplicity's sake, we will
+				.on('change','.frm_ipe_table_field input',function(){
+					$.post(ajaxurl,{
+						action:'frm_field_option_ipe',
+						element_id: $(this).closest('.frm_ipe_table_field').attr('id'),
+						update_what: 'name',
+						update_value: $(this).val()
+					});
+				}).on('click','.frm_delete_field_col,.frm_delete_field_row',function(){
+					var matches = $(this).closest('.frm_single_option').attr('id').match( /frm_delete_field_([0-9]+)-(.+)_container/ ),
+						field_id = matches[1],
+						opt_key = matches[2];
+
+					$.post(ajaxurl,{
+						action: 'frm_delete_field_option',
+						field_id: field_id,
+						opt_key: opt_key
+					});
+				});
+			;
 				
 		}
 	});
