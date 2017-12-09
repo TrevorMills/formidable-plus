@@ -1,9 +1,9 @@
 === Formidable Plus ===
 Contributors: Trevor Mills
 Tags: formidable, forms, table, new field-type
-Requires at least: 3.0 ( Formidable Pro 1.07.04 or higher is required )
-Tested up to: 4.1.1
-Stable tag: 2.0.3
+Requires at least: 3.0 ( Formidable Pro 2.0 or higher is required )
+Tested up to: 4.9
+Stable tag: 2.0.5
 
 *This plugin is no longer in active development or support.  You are free to [download the ZIP file](https://github.com/TrevorMills/formidable-plus/archive/2.0.3.zip) and use it on your WordPress site.  If you have questions, you can use the [Github Issues](https://github.com/TrevorMills/formidable-plus/issues) page and I will try to help.  No automatic updates will be provided.*
 
@@ -30,9 +30,9 @@ You can have any number of rows and any number of columns.  You can even create 
 
 Recent releases of Formidable Pro have caused headaches with Formidable Plus - breaking things in unexpected places.  Because of this, I am unable to continually test F+ against all previous versions of FPro.  I am only able to support the current version of Formidable Pro.  Odds are good that it will work in previous versions, but I need to focus my development time on the current version.
 
-*Current version of Formidable Pro supported: 1.07.11.*
+*Current version of Formidable Pro supported: 2.05.06.*
 
-= What kinds of fields can I include in a Formidable Plus table? = 
+= What kinds of fields can I include in a Formidable Plus table? =
 When you add a table field to your form, the edit widget gives you a dropdown box for each row and column.  The dropdown box contains the available field types.  Currently, these are:
 
 * Text - a plain text input field
@@ -156,6 +156,9 @@ No problem.  When you reorder, add or delete rows or columns, Formidable Plus wi
 
 
 == Changelog ==
+
+= 2.0.5 =
+* Plugin now works with Formidable Pro version 2.05.06
 
 = 2.0.3 =
 * Changed author from topquarky to Trevor Mills. I always hated that name.
